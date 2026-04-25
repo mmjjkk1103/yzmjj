@@ -228,6 +228,88 @@
             text-align: center;
         }
 
+        .partnership {
+            margin-top: 28px;
+            border-top: 1px solid var(--border);
+            padding-top: 28px;
+        }
+
+        .partnership h2 {
+            margin: 0;
+            font-size: 1.45rem;
+            line-height: 1.25;
+            letter-spacing: 0;
+        }
+
+        .partnership-copy {
+            margin: 8px 0 20px;
+            color: var(--muted);
+            line-height: 1.6;
+        }
+
+        .partnership-form {
+            display: grid;
+            gap: 14px;
+        }
+
+        .field {
+            display: grid;
+            gap: 7px;
+        }
+
+        .field label {
+            color: var(--text);
+            font-size: 0.95rem;
+            font-weight: 700;
+        }
+
+        .field input,
+        .field select,
+        .field textarea {
+            width: 100%;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            background: rgba(255, 255, 255, 0.88);
+            color: var(--text);
+            font: inherit;
+            line-height: 1.4;
+            padding: 12px 14px;
+        }
+
+        .field textarea {
+            min-height: 116px;
+            resize: vertical;
+        }
+
+        .field input:focus-visible,
+        .field select:focus-visible,
+        .field textarea:focus-visible {
+            outline: 3px solid rgba(239, 111, 154, 0.28);
+            outline-offset: 2px;
+        }
+
+        #partnership-submit {
+            color: #fff;
+            background: linear-gradient(135deg, var(--pink), var(--pink-dark));
+            box-shadow: 0 12px 28px rgba(207, 70, 118, 0.2);
+        }
+
+        .form-status {
+            min-height: 24px;
+            margin: 2px 0 0;
+            color: var(--muted);
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .form-status.success {
+            color: #227447;
+        }
+
+        .form-status.error {
+            color: #b42318;
+        }
+
         @media (max-width: 560px) {
             .app {
                 border-radius: 22px;
@@ -281,6 +363,43 @@
                 </div>
 
                 <p class="date-line" id="date-line"></p>
+
+                <section class="partnership" aria-labelledby="partnership-title">
+                    <h2 id="partnership-title">제휴 문의</h2>
+                    <p class="partnership-copy">함께 해보고 싶은 제안이 있다면 간단히 남겨주세요.</p>
+
+                    <form class="partnership-form" id="partnership-form" action="https://formspree.io/f/xvzdlljk" method="POST">
+                        <div class="field">
+                            <label for="partner-name">이름</label>
+                            <input id="partner-name" name="name" type="text" autocomplete="name" required>
+                        </div>
+
+                        <div class="field">
+                            <label for="partner-email">이메일</label>
+                            <input id="partner-email" name="email" type="email" autocomplete="email" required>
+                        </div>
+
+                        <div class="field">
+                            <label for="partner-type">제휴 유형</label>
+                            <select id="partner-type" name="partnership_type" required>
+                                <option value="">선택해주세요</option>
+                                <option value="brand">브랜드 제휴</option>
+                                <option value="content">콘텐츠 협업</option>
+                                <option value="event">이벤트/프로모션</option>
+                                <option value="other">기타 제안</option>
+                            </select>
+                        </div>
+
+                        <div class="field">
+                            <label for="partner-message">제안 내용</label>
+                            <textarea id="partner-message" name="message" placeholder="제휴 목적, 진행 방식, 연락 가능한 시간 등을 적어주세요." required></textarea>
+                        </div>
+
+                        <input type="hidden" name="_subject" value="예지 응원 사이트 제휴 문의">
+                        <button id="partnership-submit" type="submit">제휴 문의 보내기</button>
+                        <p class="form-status" id="form-status" role="status" aria-live="polite"></p>
+                    </form>
+                </section>
             </section>
         </section>
     </main>
@@ -306,6 +425,9 @@
         const copyButton = document.getElementById("copy-button");
         const dateLine = document.getElementById("date-line");
         const themeButtons = document.querySelectorAll(".theme-option");
+        const partnershipForm = document.getElementById("partnership-form");
+        const partnershipSubmit = document.getElementById("partnership-submit");
+        const formStatus = document.getElementById("form-status");
         let currentMessage = "";
 
         function pickMessage() {
@@ -395,6 +517,38 @@
             });
         }
 
+        async function submitPartnershipForm(event) {
+            event.preventDefault();
+
+            formStatus.textContent = "전송 중입니다...";
+            formStatus.className = "form-status";
+            partnershipSubmit.disabled = true;
+
+            try {
+                const response = await fetch(partnershipForm.action, {
+                    method: "POST",
+                    body: new FormData(partnershipForm),
+                    headers: {
+                        Accept: "application/json"
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error("Formspree request failed");
+                }
+
+                partnershipForm.reset();
+                formStatus.textContent = "제휴 문의가 전송되었습니다.";
+                formStatus.className = "form-status success";
+            } catch (error) {
+                console.warn("Partnership form failed.", error);
+                formStatus.textContent = "전송에 실패했습니다. 잠시 후 다시 시도해주세요.";
+                formStatus.className = "form-status error";
+            } finally {
+                partnershipSubmit.disabled = false;
+            }
+        }
+
         recommendButton.addEventListener("click", recommendMessage);
         copyButton.addEventListener("click", copyMessage);
         themeButtons.forEach((button) => {
@@ -402,6 +556,7 @@
                 setTheme(button.dataset.themeValue);
             });
         });
+        partnershipForm.addEventListener("submit", submitPartnershipForm);
 
         setTheme(localStorage.getItem("yeji-theme"));
         setDateLine();
