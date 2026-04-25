@@ -17,6 +17,40 @@
             --rose: #ffe8ef;
             --border: #f4bdcc;
             --shadow: rgba(177, 72, 105, 0.18);
+            --body-bg:
+                radial-gradient(circle at 18% 18%, rgba(255, 210, 194, 0.7), transparent 26rem),
+                radial-gradient(circle at 82% 12%, rgba(239, 111, 154, 0.18), transparent 24rem),
+                linear-gradient(135deg, var(--bg), #fffaf1);
+            --app-bg: rgba(255, 255, 255, 0.88);
+            --hero-bg:
+                linear-gradient(135deg, rgba(255, 232, 239, 0.96), rgba(255, 210, 194, 0.9)),
+                var(--rose);
+            --hero-mark:
+                linear-gradient(45deg, transparent 42%, rgba(255, 255, 255, 0.65) 43% 57%, transparent 58%),
+                linear-gradient(135deg, #ff8ab0, #ffd0bf);
+            --message-bg: linear-gradient(180deg, #fff, #fff8fa);
+        }
+
+        body[data-theme="white"] {
+            --bg: #f8fafc;
+            --text: #243040;
+            --muted: #667085;
+            --pink: #e66792;
+            --pink-dark: #b83263;
+            --peach: #ffffff;
+            --rose: #ffffff;
+            --border: #d7dee8;
+            --shadow: rgba(46, 62, 86, 0.12);
+            --body-bg:
+                radial-gradient(circle at 16% 16%, rgba(230, 103, 146, 0.11), transparent 22rem),
+                radial-gradient(circle at 84% 18%, rgba(160, 174, 192, 0.2), transparent 24rem),
+                linear-gradient(135deg, #ffffff, #f4f7fb);
+            --app-bg: rgba(255, 255, 255, 0.96);
+            --hero-bg: linear-gradient(135deg, #ffffff, #f7f9fc);
+            --hero-mark:
+                linear-gradient(45deg, transparent 42%, rgba(255, 255, 255, 0.75) 43% 57%, transparent 58%),
+                linear-gradient(135deg, #eef2f7, #ffffff);
+            --message-bg: linear-gradient(180deg, #ffffff, #fbfcfe);
         }
 
         * {
@@ -28,10 +62,7 @@
             min-height: 100vh;
             font-family: Arial, "Noto Sans KR", sans-serif;
             color: var(--text);
-            background:
-                radial-gradient(circle at 18% 18%, rgba(255, 210, 194, 0.7), transparent 26rem),
-                radial-gradient(circle at 82% 12%, rgba(239, 111, 154, 0.18), transparent 24rem),
-                linear-gradient(135deg, var(--bg), #fffaf1);
+            background: var(--body-bg);
         }
 
         .page {
@@ -46,16 +77,48 @@
             overflow: hidden;
             border: 1px solid rgba(244, 189, 204, 0.85);
             border-radius: 28px;
-            background: rgba(255, 255, 255, 0.88);
+            background: var(--app-bg);
             box-shadow: 0 24px 70px var(--shadow);
         }
 
         .hero {
             position: relative;
             padding: 34px 28px 26px;
-            background:
-                linear-gradient(135deg, rgba(255, 232, 239, 0.96), rgba(255, 210, 194, 0.9)),
-                var(--rose);
+            background: var(--hero-bg);
+        }
+
+        .theme-bar {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 22px;
+        }
+
+        .theme-toggle {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4px;
+            border: 1px solid var(--border);
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.68);
+            padding: 4px;
+        }
+
+        .theme-option {
+            min-height: 36px;
+            border-radius: 999px;
+            color: var(--muted);
+            background: transparent;
+            box-shadow: none;
+            font-size: 0.92rem;
+            padding: 6px 14px;
+        }
+
+        .theme-option.active {
+            color: #fff;
+            background: linear-gradient(135deg, var(--pink), var(--pink-dark));
+            box-shadow: 0 8px 18px rgba(207, 70, 118, 0.2);
         }
 
         .hero::after {
@@ -66,9 +129,7 @@
             width: 92px;
             height: 92px;
             border-radius: 32px;
-            background:
-                linear-gradient(45deg, transparent 42%, rgba(255, 255, 255, 0.65) 43% 57%, transparent 58%),
-                linear-gradient(135deg, #ff8ab0, #ffd0bf);
+            background: var(--hero-mark);
             opacity: 0.8;
             transform: rotate(8deg);
         }
@@ -103,7 +164,7 @@
             place-items: center;
             border: 1px solid var(--border);
             border-radius: 20px;
-            background: linear-gradient(180deg, #fff, #fff8fa);
+            background: var(--message-bg);
             padding: 28px;
         }
 
@@ -185,6 +246,10 @@
                 top: 18px;
             }
 
+            .theme-bar {
+                justify-content: flex-start;
+            }
+
             .actions {
                 grid-template-columns: 1fr;
             }
@@ -195,6 +260,12 @@
     <main class="page">
         <section class="app" aria-label="예지에게 보내는 응원 문구 추천기">
             <header class="hero">
+                <div class="theme-bar" aria-label="화면 모드 선택">
+                    <div class="theme-toggle" role="group" aria-label="테마 선택">
+                        <button class="theme-option active" type="button" data-theme-value="pink">핑크 모드</button>
+                        <button class="theme-option" type="button" data-theme-value="white">화이트 모드</button>
+                    </div>
+                </div>
                 <h1>예지에게 보내는 오늘의 응원</h1>
                 <p class="subtitle">매일 다른 마음으로, 따뜻하게 전할 수 있는 한 문장을 골라줘요.</p>
             </header>
@@ -234,6 +305,7 @@
         const recommendButton = document.getElementById("recommend-button");
         const copyButton = document.getElementById("copy-button");
         const dateLine = document.getElementById("date-line");
+        const themeButtons = document.querySelectorAll(".theme-option");
         let currentMessage = "";
 
         function pickMessage() {
@@ -311,9 +383,27 @@
             dateLine.textContent = today;
         }
 
+        function setTheme(theme) {
+            const nextTheme = theme === "white" ? "white" : "pink";
+            document.body.dataset.theme = nextTheme;
+            localStorage.setItem("yeji-theme", nextTheme);
+
+            themeButtons.forEach((button) => {
+                const isActive = button.dataset.themeValue === nextTheme;
+                button.classList.toggle("active", isActive);
+                button.setAttribute("aria-pressed", String(isActive));
+            });
+        }
+
         recommendButton.addEventListener("click", recommendMessage);
         copyButton.addEventListener("click", copyMessage);
+        themeButtons.forEach((button) => {
+            button.addEventListener("click", () => {
+                setTheme(button.dataset.themeValue);
+            });
+        });
 
+        setTheme(localStorage.getItem("yeji-theme"));
         setDateLine();
         recommendMessage();
     </script>
