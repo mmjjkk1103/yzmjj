@@ -367,6 +367,77 @@
             text-align: center;
         }
 
+        .news-section {
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: #ffffff;
+            padding: 22px;
+        }
+
+        .section-head {
+            display: flex;
+            align-items: end;
+            justify-content: space-between;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .section-title {
+            margin: 0;
+            font-size: 1.45rem;
+            line-height: 1.25;
+            letter-spacing: 0;
+        }
+
+        .section-note {
+            margin: 6px 0 0;
+            color: var(--muted);
+            line-height: 1.5;
+        }
+
+        .news-updated {
+            color: var(--muted);
+            font-size: 0.9rem;
+            white-space: nowrap;
+        }
+
+        .news-list {
+            display: grid;
+            gap: 10px;
+        }
+
+        .news-card {
+            display: grid;
+            gap: 7px;
+            border: 1px solid var(--soft-border);
+            border-radius: 10px;
+            color: inherit;
+            padding: 14px 16px;
+            text-decoration: none;
+            transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+        }
+
+        .news-card:hover {
+            border-color: rgba(255, 5, 88, 0.35);
+            box-shadow: 0 10px 24px rgba(0, 0, 0, 0.06);
+            transform: translateY(-1px);
+        }
+
+        .news-title {
+            margin: 0;
+            font-size: 1rem;
+            font-weight: 800;
+            line-height: 1.45;
+        }
+
+        .news-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            color: var(--muted);
+            font-size: 0.9rem;
+        }
+
         .partnership {
             margin-top: 28px;
             border: 1px solid var(--border);
@@ -493,6 +564,11 @@
                 grid-template-columns: 1fr;
             }
 
+            .section-head {
+                align-items: start;
+                flex-direction: column;
+            }
+
             .recipient-row {
                 grid-template-columns: 1fr;
             }
@@ -509,6 +585,7 @@
             <div class="brand">마음전달</div>
             <nav class="nav-links" aria-label="주요 메뉴">
                 <span>추천</span>
+                <span>소식</span>
                 <span>편지</span>
                 <span>제휴</span>
             </nav>
@@ -550,6 +627,17 @@
                 </div>
 
                 <p class="date-line" id="date-line"></p>
+
+                <section class="news-section" aria-labelledby="news-title">
+                    <div class="section-head">
+                        <div>
+                            <h2 class="section-title" id="news-title">오늘의 소식</h2>
+                            <p class="section-note">외부 RSS에서 가져온 최신 제목과 링크만 보여드려요.</p>
+                        </div>
+                        <span class="news-updated" id="news-updated">업데이트 확인 중</span>
+                    </div>
+                    <div class="news-list" id="news-list" aria-live="polite"></div>
+                </section>
 
                 <section class="partnership" aria-labelledby="partnership-title">
                     <h2 id="partnership-title">제휴 문의</h2>
@@ -617,6 +705,8 @@
         const partnershipForm = document.getElementById("partnership-form");
         const partnershipSubmit = document.getElementById("partnership-submit");
         const formStatus = document.getElementById("form-status");
+        const newsList = document.getElementById("news-list");
+        const newsUpdated = document.getElementById("news-updated");
         let currentMessage = "";
         let currentTemplate = "";
 
@@ -781,6 +871,85 @@
             }
         }
 
+        function formatNewsDate(value) {
+            if (!value) {
+                return "";
+            }
+
+            const date = new Date(value);
+            if (Number.isNaN(date.getTime())) {
+                return "";
+            }
+
+            return new Intl.DateTimeFormat("ko-KR", {
+                month: "short",
+                day: "numeric",
+                hour: "2-digit",
+                minute: "2-digit"
+            }).format(date);
+        }
+
+        function renderNews(items) {
+            newsList.replaceChildren();
+
+            if (!items.length) {
+                const empty = document.createElement("p");
+                empty.className = "section-note";
+                empty.textContent = "아직 표시할 소식이 없습니다.";
+                newsList.append(empty);
+                return;
+            }
+
+            items.slice(0, 6).forEach((item) => {
+                const card = document.createElement("a");
+                card.className = "news-card";
+                card.href = item.url;
+                card.target = "_blank";
+                card.rel = "noopener noreferrer";
+
+                const title = document.createElement("p");
+                title.className = "news-title";
+                title.textContent = item.title;
+
+                const meta = document.createElement("div");
+                meta.className = "news-meta";
+
+                const source = document.createElement("span");
+                source.textContent = item.source || "외부 소식";
+                meta.append(source);
+
+                const published = formatNewsDate(item.publishedAt);
+                if (published) {
+                    const date = document.createElement("span");
+                    date.textContent = published;
+                    meta.append(date);
+                }
+
+                card.append(title, meta);
+                newsList.append(card);
+            });
+        }
+
+        async function loadNews() {
+            try {
+                const response = await fetch(`news.json?ts=${Date.now()}`, {
+                    cache: "no-store"
+                });
+
+                if (!response.ok) {
+                    throw new Error("news.json request failed");
+                }
+
+                const data = await response.json();
+                renderNews(Array.isArray(data.items) ? data.items : []);
+                newsUpdated.textContent = data.updatedAt ? `${formatNewsDate(data.updatedAt)} 갱신` : "자동 갱신";
+            } catch (error) {
+                console.warn("News load failed.", error);
+                renderNews([]);
+                newsUpdated.textContent = "소식 준비 중";
+            }
+        }
+
         recommendButton.addEventListener("click", recommendMessage);
         applyRecipientButton.addEventListener("click", refreshCurrentMessage);
         recipientNameInput.addEventListener("input", refreshCurrentMessage);
@@ -795,6 +964,7 @@
         setTheme(localStorage.getItem("yeji-theme"));
         setDateLine();
         recommendMessage();
+        loadNews();
     </script>
 </body>
 </html>
