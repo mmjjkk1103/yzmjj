@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>예지에게 보내는 오늘의 응원</title>
+    <title>누군가에게 보내는 오늘의 편지</title>
     <style>
         :root {
             --bg: #fff6f8;
@@ -17,6 +17,9 @@
             --rose: #ffe8ef;
             --border: #f4bdcc;
             --shadow: rgba(177, 72, 105, 0.18);
+            --accent-yellow: #ffe48a;
+            --accent-mint: #a8ead3;
+            --accent-lilac: #d9c7ff;
             --body-bg:
                 radial-gradient(circle at 18% 18%, rgba(255, 210, 194, 0.7), transparent 26rem),
                 radial-gradient(circle at 82% 12%, rgba(239, 111, 154, 0.18), transparent 24rem),
@@ -41,6 +44,9 @@
             --rose: #ffffff;
             --border: #d7dee8;
             --shadow: rgba(46, 62, 86, 0.12);
+            --accent-yellow: #ffeaa6;
+            --accent-mint: #bff3e5;
+            --accent-lilac: #d9d4ff;
             --body-bg:
                 radial-gradient(circle at 16% 16%, rgba(230, 103, 146, 0.11), transparent 22rem),
                 radial-gradient(circle at 84% 18%, rgba(160, 174, 192, 0.2), transparent 24rem),
@@ -73,12 +79,24 @@
         }
 
         .app {
+            position: relative;
             width: min(720px, 100%);
             overflow: hidden;
             border: 1px solid rgba(244, 189, 204, 0.85);
             border-radius: 28px;
             background: var(--app-bg);
             box-shadow: 0 24px 70px var(--shadow);
+        }
+
+        .app::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            background:
+                linear-gradient(90deg, var(--accent-yellow), var(--pink), var(--accent-lilac), var(--accent-mint));
+            height: 7px;
+            z-index: 2;
         }
 
         .hero {
@@ -134,6 +152,31 @@
             transform: rotate(8deg);
         }
 
+        .hero-note {
+            position: relative;
+            z-index: 1;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 14px;
+            border: 1px solid rgba(239, 111, 154, 0.18);
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.62);
+            color: var(--pink-dark);
+            font-size: 0.9rem;
+            font-weight: 700;
+            padding: 8px 12px;
+        }
+
+        .hero-note::before {
+            content: "";
+            width: 10px;
+            height: 10px;
+            border-radius: 999px;
+            background: linear-gradient(135deg, var(--accent-yellow), var(--pink));
+            box-shadow: 12px 0 0 var(--accent-mint), 24px 0 0 var(--accent-lilac);
+        }
+
         h1 {
             position: relative;
             z-index: 1;
@@ -159,6 +202,7 @@
         }
 
         .message-box {
+            position: relative;
             display: grid;
             min-height: 190px;
             place-items: center;
@@ -166,6 +210,66 @@
             border-radius: 20px;
             background: var(--message-bg);
             padding: 28px;
+        }
+
+        .message-box::before {
+            content: "";
+            position: absolute;
+            left: 18px;
+            top: 18px;
+            width: 54px;
+            height: 12px;
+            border-radius: 999px;
+            background: linear-gradient(90deg, var(--accent-yellow), var(--accent-mint), var(--accent-lilac));
+            opacity: 0.95;
+        }
+
+        .recipient-panel {
+            display: grid;
+            gap: 8px;
+            margin-bottom: 18px;
+        }
+
+        .recipient-panel label {
+            font-size: 0.95rem;
+            font-weight: 700;
+        }
+
+        .recipient-row {
+            display: grid;
+            gap: 10px;
+            grid-template-columns: 1fr auto;
+        }
+
+        #recipient-name {
+            width: 100%;
+            border: 1px solid var(--border);
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.88);
+            color: var(--text);
+            font: inherit;
+            min-height: 52px;
+            padding: 12px 18px;
+        }
+
+        #recipient-name:focus-visible {
+            outline: 3px solid rgba(239, 111, 154, 0.28);
+            outline-offset: 2px;
+        }
+
+        #apply-recipient-button {
+            color: #fff;
+            background: linear-gradient(135deg, var(--pink), var(--pink-dark));
+            box-shadow: 0 12px 28px rgba(207, 70, 118, 0.18);
+            padding: 0 18px;
+            white-space: nowrap;
+        }
+
+        .recipient-help {
+            margin: 0;
+            color: var(--muted);
+            font-size: 0.92rem;
+            line-height: 1.5;
         }
 
         #message {
@@ -205,7 +309,9 @@
 
         #recommend-button {
             color: #fff;
-            background: linear-gradient(135deg, var(--pink), var(--pink-dark));
+            background:
+                linear-gradient(135deg, rgba(255, 255, 255, 0.18), transparent 34%),
+                linear-gradient(135deg, var(--pink), var(--pink-dark));
             box-shadow: 0 12px 28px rgba(207, 70, 118, 0.26);
         }
 
@@ -328,6 +434,10 @@
                 top: 18px;
             }
 
+            .hero-note {
+                max-width: calc(100% - 72px);
+            }
+
             .theme-bar {
                 justify-content: flex-start;
             }
@@ -335,12 +445,20 @@
             .actions {
                 grid-template-columns: 1fr;
             }
+
+            .recipient-row {
+                grid-template-columns: 1fr;
+            }
+
+            #apply-recipient-button {
+                width: 100%;
+            }
         }
     </style>
 </head>
 <body>
     <main class="page">
-        <section class="app" aria-label="예지에게 보내는 응원 문구 추천기">
+        <section class="app" aria-label="오늘의 편지 문구 추천기">
             <header class="hero">
                 <div class="theme-bar" aria-label="화면 모드 선택">
                     <div class="theme-toggle" role="group" aria-label="테마 선택">
@@ -348,11 +466,21 @@
                         <button class="theme-option" type="button" data-theme-value="white">화이트 모드</button>
                     </div>
                 </div>
-                <h1>예지에게 보내는 오늘의 응원</h1>
-                <p class="subtitle">매일 다른 마음으로, 따뜻하게 전할 수 있는 한 문장을 골라줘요.</p>
+                <div class="hero-note">daily tiny letter</div>
+                <h1>누군가에게 보내는 오늘의 편지</h1>
+                <p class="subtitle">받는 사람을 비워두거나 직접 적어서, 따뜻하게 전할 수 있는 한 문장을 골라줘요.</p>
             </header>
 
             <section class="content">
+                <div class="recipient-panel">
+                    <label for="recipient-name">받는 사람</label>
+                    <div class="recipient-row">
+                        <input id="recipient-name" type="text" autocomplete="off" placeholder="비워두면 누군가에게 보내는 문구로 추천돼요">
+                        <button id="apply-recipient-button" type="button">적용</button>
+                    </div>
+                    <p class="recipient-help">예: 엄마, 친구, 소중한 사람처럼 자유롭게 적을 수 있어요.</p>
+                </div>
+
                 <div class="message-box" aria-live="polite">
                     <p id="message"></p>
                 </div>
@@ -395,7 +523,7 @@
                             <textarea id="partner-message" name="message" placeholder="제휴 목적, 진행 방식, 연락 가능한 시간 등을 적어주세요." required></textarea>
                         </div>
 
-                        <input type="hidden" name="_subject" value="예지 응원 사이트 제휴 문의">
+                        <input type="hidden" name="_subject" value="오늘의 편지 사이트 제휴 문의">
                         <button id="partnership-submit" type="submit">제휴 문의 보내기</button>
                         <p class="form-status" id="form-status" role="status" aria-live="polite"></p>
                     </form>
@@ -406,21 +534,23 @@
 
     <script>
         const messages = [
-            "예지야, 오늘도 네가 해내는 모든 순간을 믿고 응원해.",
-            "예지야, 완벽하지 않아도 괜찮아. 너는 충분히 잘하고 있어.",
-            "오늘 하루도 예지답게 천천히, 단단하게 걸어가면 돼.",
-            "예지야, 네가 웃는 순간들이 오늘 더 많이 생기길 바라.",
-            "힘든 일이 있어도 예지는 분명 잘 넘길 수 있는 사람이야.",
-            "예지야, 오늘의 작은 노력들이 내일의 너를 더 빛나게 할 거야.",
-            "네 편에서 늘 응원하고 있어. 예지야, 오늘도 파이팅.",
-            "예지야, 쉬어가도 괜찮아. 중요한 건 네 마음을 지키는 거야.",
-            "오늘도 예지의 따뜻함과 성실함이 분명 좋은 곳에 닿을 거야.",
-            "예지야, 너는 생각보다 훨씬 강하고 멋진 사람이야.",
-            "조급해하지 않아도 돼. 예지는 예지의 속도로 잘 가고 있어.",
-            "예지야, 오늘 하루가 너에게 다정한 기억으로 남았으면 좋겠어."
+            "{name}, 오늘도 네가 해내는 모든 순간을 믿고 응원해.",
+            "{name}, 완벽하지 않아도 괜찮아. 너는 충분히 잘하고 있어.",
+            "오늘 하루도 {name}답게 천천히, 단단하게 걸어가면 돼.",
+            "{name}, 네가 웃는 순간들이 오늘 더 많이 생기길 바라.",
+            "힘든 일이 있어도 {name}도 분명 잘 넘길 수 있는 사람이야.",
+            "{name}, 오늘의 작은 노력들이 내일의 너를 더 빛나게 할 거야.",
+            "네 편에서 늘 응원하고 있어. {name}, 오늘도 파이팅.",
+            "{name}, 쉬어가도 괜찮아. 중요한 건 네 마음을 지키는 거야.",
+            "오늘도 {name}의 따뜻함과 성실함이 분명 좋은 곳에 닿을 거야.",
+            "{name}, 너는 생각보다 훨씬 강하고 멋진 사람이야.",
+            "조급해하지 않아도 돼. {name}도 {name}의 속도로 잘 가고 있어.",
+            "{name}, 오늘 하루가 너에게 다정한 기억으로 남았으면 좋겠어."
         ];
 
         const messageElement = document.getElementById("message");
+        const recipientNameInput = document.getElementById("recipient-name");
+        const applyRecipientButton = document.getElementById("apply-recipient-button");
         const recommendButton = document.getElementById("recommend-button");
         const copyButton = document.getElementById("copy-button");
         const dateLine = document.getElementById("date-line");
@@ -429,14 +559,23 @@
         const partnershipSubmit = document.getElementById("partnership-submit");
         const formStatus = document.getElementById("form-status");
         let currentMessage = "";
+        let currentTemplate = "";
+
+        function getRecipientName() {
+            return recipientNameInput.value.trim() || "누군가";
+        }
+
+        function formatMessage(template) {
+            return template.replaceAll("{name}", getRecipientName());
+        }
 
         function pickMessage() {
             if (messages.length === 1) {
                 return messages[0];
             }
 
-            let nextMessage = currentMessage;
-            while (nextMessage === currentMessage) {
+            let nextMessage = currentTemplate;
+            while (nextMessage === currentTemplate) {
                 const index = Math.floor(Math.random() * messages.length);
                 nextMessage = messages[index];
             }
@@ -444,7 +583,20 @@
         }
 
         function recommendMessage() {
-            currentMessage = pickMessage();
+            currentTemplate = pickMessage();
+            currentMessage = formatMessage(currentTemplate);
+            messageElement.textContent = currentMessage;
+            copyButton.textContent = "문구 복사하기";
+            copyButton.classList.remove("copied");
+        }
+
+        function refreshCurrentMessage() {
+            if (!currentTemplate) {
+                recommendMessage();
+                return;
+            }
+
+            currentMessage = formatMessage(currentTemplate);
             messageElement.textContent = currentMessage;
             copyButton.textContent = "문구 복사하기";
             copyButton.classList.remove("copied");
@@ -550,6 +702,8 @@
         }
 
         recommendButton.addEventListener("click", recommendMessage);
+        applyRecipientButton.addEventListener("click", refreshCurrentMessage);
+        recipientNameInput.addEventListener("input", refreshCurrentMessage);
         copyButton.addEventListener("click", copyMessage);
         themeButtons.forEach((button) => {
             button.addEventListener("click", () => {
