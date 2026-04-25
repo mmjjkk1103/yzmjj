@@ -930,7 +930,102 @@
             });
         }
 
-        async function loadNews() {
+        const liveNewsSources = [
+            {
+                source: "BBC News 코리아",
+                url: "https://feeds.bbci.co.uk/korean/rss.xml"
+            },
+            {
+                source: "Google 뉴스",
+                url: "https://news.google.com/rss?hl=ko&gl=KR&ceid=KR:ko"
+            },
+            {
+                source: "The Guardian Life",
+                url: "https://www.theguardian.com/lifeandstyle/rss"
+            }
+        ];
+
+        function textFromXml(node, selector) {
+            return node.querySelector(selector)?.textContent?.trim() || "";
+        }
+
+        function linkFromXml(node) {
+            const atomLink = node.querySelector("link[href]");
+            return atomLink?.getAttribute("href") || textFromXml(node, "link");
+        }
+
+        function parseNewsXml(xmlText, source) {
+            const documentXml = new DOMParser().parseFromString(xmlText, "text/xml");
+            const parserError = documentXml.querySelector("parsererror");
+            if (parserError) {
+                throw new Error(`${source} RSS parse failed`);
+            }
+
+            return Array.from(documentXml.querySelectorAll("item, entry"))
+                .map((item) => {
+                    const title = textFromXml(item, "title");
+                    const url = linkFromXml(item);
+                    const publishedAt =
+                        textFromXml(item, "pubDate") ||
+                        textFromXml(item, "published") ||
+                        textFromXml(item, "updated");
+
+                    if (!title || !url) {
+                        return null;
+                    }
+
+                    return {
+                        title,
+                        url,
+                        source,
+                        publishedAt
+                    };
+                })
+                .filter(Boolean);
+        }
+
+        function dedupeNews(items) {
+            const seen = new Set();
+            return items.filter((item) => {
+                const key = item.url || item.title;
+                if (seen.has(key)) {
+                    return false;
+                }
+                seen.add(key);
+                return true;
+            });
+        }
+
+        async function fetchLiveSource(source) {
+            const proxiedUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(source.url)}`;
+            const response = await fetch(proxiedUrl, {
+                cache: "no-store"
+            });
+
+            if (!response.ok) {
+                throw new Error(`${source.source} live RSS request failed`);
+            }
+
+            return parseNewsXml(await response.text(), source.source);
+        }
+
+        async function loadLiveNews() {
+            const results = await Promise.allSettled(liveNewsSources.map(fetchLiveSource));
+            const items = dedupeNews(
+                results
+                    .flatMap((result) => (result.status === "fulfilled" ? result.value : []))
+                    .sort((a, b) => new Date(b.publishedAt) - new Date(a.publishedAt))
+            );
+
+            if (!items.length) {
+                throw new Error("No live RSS items loaded");
+            }
+
+            renderNews(items);
+            newsUpdated.textContent = `${formatNewsDate(new Date().toISOString())} 실시간 확인`;
+        }
+
+        async function loadCachedNews() {
             try {
                 const response = await fetch(`news.json?ts=${Date.now()}`, {
                     cache: "no-store"
@@ -947,6 +1042,17 @@
                 console.warn("News load failed.", error);
                 renderNews([]);
                 newsUpdated.textContent = "소식 준비 중";
+            }
+        }
+
+        async function loadNews() {
+            newsUpdated.textContent = "실시간 확인 중";
+
+            try {
+                await loadLiveNews();
+            } catch (error) {
+                console.warn("Live news load failed, using cached news.", error);
+                await loadCachedNews();
             }
         }
 
