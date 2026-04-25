@@ -15,56 +15,38 @@
     <meta name="twitter:description" content="받는 사람을 비워두거나 직접 적어서, 따뜻하게 전할 수 있는 오늘의 마음 문구를 추천받아보세요.">
     <style>
         :root {
-            --bg: #fff6f8;
+            --bg: #f8f8f8;
             --panel: #ffffff;
-            --text: #39252b;
-            --muted: #7b5b64;
-            --pink: #ef6f9a;
-            --pink-dark: #cf4676;
-            --peach: #ffd2c2;
-            --rose: #ffe8ef;
-            --border: #f4bdcc;
-            --shadow: rgba(177, 72, 105, 0.18);
-            --accent-yellow: #ffe48a;
-            --accent-mint: #a8ead3;
-            --accent-lilac: #d9c7ff;
-            --body-bg:
-                radial-gradient(circle at 18% 18%, rgba(255, 210, 194, 0.7), transparent 26rem),
-                radial-gradient(circle at 82% 12%, rgba(239, 111, 154, 0.18), transparent 24rem),
-                linear-gradient(135deg, var(--bg), #fffaf1);
-            --app-bg: rgba(255, 255, 255, 0.88);
-            --hero-bg:
-                linear-gradient(135deg, rgba(255, 232, 239, 0.96), rgba(255, 210, 194, 0.9)),
-                var(--rose);
-            --hero-mark:
-                linear-gradient(45deg, transparent 42%, rgba(255, 255, 255, 0.65) 43% 57%, transparent 58%),
-                linear-gradient(135deg, #ff8ab0, #ffd0bf);
-            --message-bg: linear-gradient(180deg, #fff, #fff8fa);
+            --text: #292a32;
+            --muted: #74747b;
+            --pink: #ff0558;
+            --pink-dark: #d90047;
+            --rose: #fff4f7;
+            --border: #e5e5e8;
+            --soft-border: #f0f0f2;
+            --shadow: rgba(0, 0, 0, 0.08);
+            --accent-yellow: #ffe66d;
+            --accent-mint: #8ee6d2;
+            --accent-lilac: #cdbdff;
+            --body-bg: var(--bg);
+            --app-bg: transparent;
+            --hero-bg: #ffffff;
+            --message-bg: #ffffff;
         }
 
         body[data-theme="white"] {
-            --bg: #f8fafc;
+            --bg: #fbfbfc;
             --text: #243040;
             --muted: #667085;
-            --pink: #e66792;
-            --pink-dark: #b83263;
-            --peach: #ffffff;
+            --pink: #ff0558;
+            --pink-dark: #d90047;
             --rose: #ffffff;
-            --border: #d7dee8;
-            --shadow: rgba(46, 62, 86, 0.12);
-            --accent-yellow: #ffeaa6;
-            --accent-mint: #bff3e5;
-            --accent-lilac: #d9d4ff;
-            --body-bg:
-                radial-gradient(circle at 16% 16%, rgba(230, 103, 146, 0.11), transparent 22rem),
-                radial-gradient(circle at 84% 18%, rgba(160, 174, 192, 0.2), transparent 24rem),
-                linear-gradient(135deg, #ffffff, #f4f7fb);
-            --app-bg: rgba(255, 255, 255, 0.96);
-            --hero-bg: linear-gradient(135deg, #ffffff, #f7f9fc);
-            --hero-mark:
-                linear-gradient(45deg, transparent 42%, rgba(255, 255, 255, 0.75) 43% 57%, transparent 58%),
-                linear-gradient(135deg, #eef2f7, #ffffff);
-            --message-bg: linear-gradient(180deg, #ffffff, #fbfcfe);
+            --border: #e3e6eb;
+            --soft-border: #eef0f3;
+            --shadow: rgba(38, 45, 58, 0.08);
+            --body-bg: #fbfbfc;
+            --hero-bg: #ffffff;
+            --message-bg: #ffffff;
         }
 
         * {
@@ -79,38 +61,75 @@
             background: var(--body-bg);
         }
 
-        .page {
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            border-bottom: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.96);
+            backdrop-filter: blur(16px);
+        }
+
+        .topbar-inner {
             display: grid;
-            min-height: 100vh;
-            place-items: center;
-            padding: 28px 16px;
+            grid-template-columns: auto 1fr auto;
+            align-items: center;
+            gap: 18px;
+            width: min(1040px, 100%);
+            margin: 0 auto;
+            padding: 13px 20px;
+        }
+
+        .brand {
+            color: var(--pink);
+            font-size: 1.25rem;
+            font-weight: 900;
+            letter-spacing: 0;
+            white-space: nowrap;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 18px;
+            color: #55565d;
+            font-size: 0.95rem;
+            font-weight: 700;
+        }
+
+        .search-pill {
+            display: flex;
+            align-items: center;
+            min-height: 38px;
+            border: 1px solid var(--soft-border);
+            border-radius: 9px;
+            background: #f5f5f7;
+            color: #8a8b91;
+            font-size: 0.92rem;
+            padding: 0 14px;
+            white-space: nowrap;
+        }
+
+        .page {
+            min-height: calc(100vh - 65px);
+            padding: 0 20px 48px;
         }
 
         .app {
             position: relative;
-            width: min(720px, 100%);
-            overflow: hidden;
-            border: 1px solid rgba(244, 189, 204, 0.85);
-            border-radius: 28px;
+            width: min(960px, 100%);
+            margin: 0 auto;
             background: var(--app-bg);
-            box-shadow: 0 24px 70px var(--shadow);
         }
 
         .app::before {
-            content: "";
-            position: absolute;
-            inset: 0;
-            pointer-events: none;
-            background:
-                linear-gradient(90deg, var(--accent-yellow), var(--pink), var(--accent-lilac), var(--accent-mint));
-            height: 7px;
-            z-index: 2;
+            content: none;
         }
 
         .hero {
             position: relative;
-            padding: 34px 28px 26px;
+            border-bottom: 1px solid var(--border);
             background: var(--hero-bg);
+            padding: 42px 0 30px;
         }
 
         .theme-bar {
@@ -118,7 +137,7 @@
             z-index: 1;
             display: flex;
             justify-content: flex-end;
-            margin-bottom: 22px;
+            margin-bottom: 24px;
         }
 
         .theme-toggle {
@@ -127,7 +146,7 @@
             gap: 4px;
             border: 1px solid var(--border);
             border-radius: 999px;
-            background: rgba(255, 255, 255, 0.68);
+            background: #f6f6f7;
             padding: 4px;
         }
 
@@ -143,21 +162,12 @@
 
         .theme-option.active {
             color: #fff;
-            background: linear-gradient(135deg, var(--pink), var(--pink-dark));
-            box-shadow: 0 8px 18px rgba(207, 70, 118, 0.2);
+            background: var(--pink);
+            box-shadow: 0 8px 20px rgba(255, 5, 88, 0.22);
         }
 
         .hero::after {
-            content: "";
-            position: absolute;
-            right: 24px;
-            top: 24px;
-            width: 92px;
-            height: 92px;
-            border-radius: 32px;
-            background: var(--hero-mark);
-            opacity: 0.8;
-            transform: rotate(8deg);
+            content: none;
         }
 
         .hero-note {
@@ -167,9 +177,9 @@
             align-items: center;
             gap: 8px;
             margin-bottom: 14px;
-            border: 1px solid rgba(239, 111, 154, 0.18);
+            border: 1px solid rgba(255, 5, 88, 0.16);
             border-radius: 999px;
-            background: rgba(255, 255, 255, 0.62);
+            background: var(--rose);
             color: var(--pink-dark);
             font-size: 0.9rem;
             font-weight: 700;
@@ -181,17 +191,17 @@
             width: 10px;
             height: 10px;
             border-radius: 999px;
-            background: linear-gradient(135deg, var(--accent-yellow), var(--pink));
-            box-shadow: 12px 0 0 var(--accent-mint), 24px 0 0 var(--accent-lilac);
+            background: var(--pink);
+            box-shadow: 12px 0 0 var(--accent-yellow), 24px 0 0 var(--accent-mint);
         }
 
         h1 {
             position: relative;
             z-index: 1;
             margin: 0;
-            max-width: 520px;
-            font-size: clamp(2rem, 7vw, 3.75rem);
-            line-height: 1.08;
+            max-width: 680px;
+            font-size: clamp(2rem, 6vw, 3.35rem);
+            line-height: 1.12;
             letter-spacing: 0;
         }
 
@@ -199,14 +209,16 @@
             position: relative;
             z-index: 1;
             margin: 14px 0 0;
-            max-width: 520px;
+            max-width: 620px;
             color: var(--muted);
             font-size: 1.05rem;
             line-height: 1.6;
         }
 
         .content {
-            padding: 28px;
+            display: grid;
+            gap: 24px;
+            padding: 28px 0 0;
         }
 
         .message-box {
@@ -215,9 +227,10 @@
             min-height: 190px;
             place-items: center;
             border: 1px solid var(--border);
-            border-radius: 20px;
+            border-radius: 12px;
             background: var(--message-bg);
-            padding: 28px;
+            box-shadow: 0 12px 32px var(--shadow);
+            padding: 34px 28px 30px;
         }
 
         .message-box::before {
@@ -225,17 +238,20 @@
             position: absolute;
             left: 18px;
             top: 18px;
-            width: 54px;
-            height: 12px;
+            width: 48px;
+            height: 6px;
             border-radius: 999px;
-            background: linear-gradient(90deg, var(--accent-yellow), var(--accent-mint), var(--accent-lilac));
+            background: var(--pink);
             opacity: 0.95;
         }
 
         .recipient-panel {
             display: grid;
             gap: 8px;
-            margin-bottom: 18px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: #ffffff;
+            padding: 18px;
         }
 
         .recipient-panel label {
@@ -252,8 +268,8 @@
         #recipient-name {
             width: 100%;
             border: 1px solid var(--border);
-            border-radius: 999px;
-            background: rgba(255, 255, 255, 0.88);
+            border-radius: 9px;
+            background: #f8f8fa;
             color: var(--text);
             font: inherit;
             min-height: 52px;
@@ -267,8 +283,8 @@
 
         #apply-recipient-button {
             color: #fff;
-            background: linear-gradient(135deg, var(--pink), var(--pink-dark));
-            box-shadow: 0 12px 28px rgba(207, 70, 118, 0.18);
+            background: var(--pink);
+            box-shadow: 0 10px 24px rgba(255, 5, 88, 0.18);
             padding: 0 18px;
             white-space: nowrap;
         }
@@ -296,7 +312,7 @@
             margin: 0 0.12em;
             border-bottom: 4px solid var(--pink);
             border-radius: 999px;
-            background: linear-gradient(90deg, transparent, rgba(255, 228, 138, 0.75), transparent);
+            background: linear-gradient(90deg, transparent, rgba(255, 5, 88, 0.1), transparent);
             vertical-align: -0.02em;
         }
 
@@ -328,10 +344,8 @@
 
         #recommend-button {
             color: #fff;
-            background:
-                linear-gradient(135deg, rgba(255, 255, 255, 0.18), transparent 34%),
-                linear-gradient(135deg, var(--pink), var(--pink-dark));
-            box-shadow: 0 12px 28px rgba(207, 70, 118, 0.26);
+            background: var(--pink);
+            box-shadow: 0 12px 28px rgba(255, 5, 88, 0.24);
         }
 
         #copy-button {
@@ -355,8 +369,11 @@
 
         .partnership {
             margin-top: 28px;
-            border-top: 1px solid var(--border);
-            padding-top: 28px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: #ffffff;
+            margin-top: 0;
+            padding: 22px;
         }
 
         .partnership h2 {
@@ -393,8 +410,8 @@
         .field textarea {
             width: 100%;
             border: 1px solid var(--border);
-            border-radius: 14px;
-            background: rgba(255, 255, 255, 0.88);
+            border-radius: 9px;
+            background: #f8f8fa;
             color: var(--text);
             font: inherit;
             line-height: 1.4;
@@ -415,8 +432,8 @@
 
         #partnership-submit {
             color: #fff;
-            background: linear-gradient(135deg, var(--pink), var(--pink-dark));
-            box-shadow: 0 12px 28px rgba(207, 70, 118, 0.2);
+            background: var(--pink);
+            box-shadow: 0 12px 28px rgba(255, 5, 88, 0.2);
         }
 
         .form-status {
@@ -436,21 +453,32 @@
         }
 
         @media (max-width: 560px) {
-            .app {
-                border-radius: 22px;
+            .topbar-inner {
+                grid-template-columns: 1fr auto;
+                gap: 12px;
+                padding: 12px 16px;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .search-pill {
+                font-size: 0;
+                min-width: 38px;
+                padding: 0;
+                justify-content: center;
+            }
+
+            .search-pill::before {
+                content: "검색";
+                font-size: 0.88rem;
             }
 
             .hero,
             .content {
-                padding: 24px 18px;
-            }
-
-            .hero::after {
-                width: 64px;
-                height: 64px;
-                border-radius: 22px;
-                right: 16px;
-                top: 18px;
+                padding-left: 0;
+                padding-right: 0;
             }
 
             .hero-note {
@@ -476,6 +504,18 @@
     </style>
 </head>
 <body>
+    <header class="topbar">
+        <div class="topbar-inner">
+            <div class="brand">마음전달</div>
+            <nav class="nav-links" aria-label="주요 메뉴">
+                <span>추천</span>
+                <span>편지</span>
+                <span>제휴</span>
+            </nav>
+            <div class="search-pill" aria-label="문구 검색">콘텐츠, 마음, 문구 검색</div>
+        </div>
+    </header>
+
     <main class="page">
         <section class="app" aria-label="오늘의 마음 전달 문구 추천기">
             <header class="hero">
