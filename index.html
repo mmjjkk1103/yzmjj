@@ -1,14 +1,321 @@
-<!doctype html>
-<html lang="en">
+
+<!DOCTYPE html>
+<html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Hello World</title>
-  <link href='/style.css' rel='stylesheet'>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>예지에게 보내는 오늘의 응원</title>
+    <style>
+        :root {
+            --bg: #fff6f8;
+            --panel: #ffffff;
+            --text: #39252b;
+            --muted: #7b5b64;
+            --pink: #ef6f9a;
+            --pink-dark: #cf4676;
+            --peach: #ffd2c2;
+            --rose: #ffe8ef;
+            --border: #f4bdcc;
+            --shadow: rgba(177, 72, 105, 0.18);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: Arial, "Noto Sans KR", sans-serif;
+            color: var(--text);
+            background:
+                radial-gradient(circle at 18% 18%, rgba(255, 210, 194, 0.7), transparent 26rem),
+                radial-gradient(circle at 82% 12%, rgba(239, 111, 154, 0.18), transparent 24rem),
+                linear-gradient(135deg, var(--bg), #fffaf1);
+        }
+
+        .page {
+            display: grid;
+            min-height: 100vh;
+            place-items: center;
+            padding: 28px 16px;
+        }
+
+        .app {
+            width: min(720px, 100%);
+            overflow: hidden;
+            border: 1px solid rgba(244, 189, 204, 0.85);
+            border-radius: 28px;
+            background: rgba(255, 255, 255, 0.88);
+            box-shadow: 0 24px 70px var(--shadow);
+        }
+
+        .hero {
+            position: relative;
+            padding: 34px 28px 26px;
+            background:
+                linear-gradient(135deg, rgba(255, 232, 239, 0.96), rgba(255, 210, 194, 0.9)),
+                var(--rose);
+        }
+
+        .hero::after {
+            content: "";
+            position: absolute;
+            right: 24px;
+            top: 24px;
+            width: 92px;
+            height: 92px;
+            border-radius: 32px;
+            background:
+                linear-gradient(45deg, transparent 42%, rgba(255, 255, 255, 0.65) 43% 57%, transparent 58%),
+                linear-gradient(135deg, #ff8ab0, #ffd0bf);
+            opacity: 0.8;
+            transform: rotate(8deg);
+        }
+
+        h1 {
+            position: relative;
+            z-index: 1;
+            margin: 0;
+            max-width: 520px;
+            font-size: clamp(2rem, 7vw, 3.75rem);
+            line-height: 1.08;
+            letter-spacing: 0;
+        }
+
+        .subtitle {
+            position: relative;
+            z-index: 1;
+            margin: 14px 0 0;
+            max-width: 520px;
+            color: var(--muted);
+            font-size: 1.05rem;
+            line-height: 1.6;
+        }
+
+        .content {
+            padding: 28px;
+        }
+
+        .message-box {
+            display: grid;
+            min-height: 190px;
+            place-items: center;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            background: linear-gradient(180deg, #fff, #fff8fa);
+            padding: 28px;
+        }
+
+        #message {
+            margin: 0;
+            text-align: center;
+            font-size: clamp(1.35rem, 4vw, 2rem);
+            font-weight: 700;
+            line-height: 1.45;
+            word-break: keep-all;
+        }
+
+        .actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 18px;
+        }
+
+        button {
+            min-height: 52px;
+            border: 0;
+            border-radius: 999px;
+            cursor: pointer;
+            font: inherit;
+            font-weight: 700;
+            transition: transform 160ms ease, box-shadow 160ms ease, background 160ms ease;
+        }
+
+        button:active {
+            transform: translateY(1px);
+        }
+
+        button:focus-visible {
+            outline: 3px solid rgba(239, 111, 154, 0.35);
+            outline-offset: 3px;
+        }
+
+        #recommend-button {
+            color: #fff;
+            background: linear-gradient(135deg, var(--pink), var(--pink-dark));
+            box-shadow: 0 12px 28px rgba(207, 70, 118, 0.26);
+        }
+
+        #copy-button {
+            color: var(--pink-dark);
+            background: #fff;
+            border: 1px solid var(--border);
+        }
+
+        #copy-button.copied {
+            color: #fff;
+            background: #b44d74;
+            border-color: #b44d74;
+        }
+
+        .date-line {
+            margin: 18px 0 0;
+            color: var(--muted);
+            font-size: 0.95rem;
+            text-align: center;
+        }
+
+        @media (max-width: 560px) {
+            .app {
+                border-radius: 22px;
+            }
+
+            .hero,
+            .content {
+                padding: 24px 18px;
+            }
+
+            .hero::after {
+                width: 64px;
+                height: 64px;
+                border-radius: 22px;
+                right: 16px;
+                top: 18px;
+            }
+
+            .actions {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
 <body>
-  <h1>Hello, world!</h1>
-  <button onclick="console.log('hello');">Press me</button>
-  <script defer type="text/javascript" src="/main.js"></script>
+    <main class="page">
+        <section class="app" aria-label="예지에게 보내는 응원 문구 추천기">
+            <header class="hero">
+                <h1>예지에게 보내는 오늘의 응원</h1>
+                <p class="subtitle">매일 다른 마음으로, 따뜻하게 전할 수 있는 한 문장을 골라줘요.</p>
+            </header>
+
+            <section class="content">
+                <div class="message-box" aria-live="polite">
+                    <p id="message"></p>
+                </div>
+
+                <div class="actions">
+                    <button id="recommend-button" type="button">문구 추천받기</button>
+                    <button id="copy-button" type="button">문구 복사하기</button>
+                </div>
+
+                <p class="date-line" id="date-line"></p>
+            </section>
+        </section>
+    </main>
+
+    <script>
+        const messages = [
+            "예지야, 오늘도 네가 해내는 모든 순간을 믿고 응원해.",
+            "예지야, 완벽하지 않아도 괜찮아. 너는 충분히 잘하고 있어.",
+            "오늘 하루도 예지답게 천천히, 단단하게 걸어가면 돼.",
+            "예지야, 네가 웃는 순간들이 오늘 더 많이 생기길 바라.",
+            "힘든 일이 있어도 예지는 분명 잘 넘길 수 있는 사람이야.",
+            "예지야, 오늘의 작은 노력들이 내일의 너를 더 빛나게 할 거야.",
+            "네 편에서 늘 응원하고 있어. 예지야, 오늘도 파이팅.",
+            "예지야, 쉬어가도 괜찮아. 중요한 건 네 마음을 지키는 거야.",
+            "오늘도 예지의 따뜻함과 성실함이 분명 좋은 곳에 닿을 거야.",
+            "예지야, 너는 생각보다 훨씬 강하고 멋진 사람이야.",
+            "조급해하지 않아도 돼. 예지는 예지의 속도로 잘 가고 있어.",
+            "예지야, 오늘 하루가 너에게 다정한 기억으로 남았으면 좋겠어."
+        ];
+
+        const messageElement = document.getElementById("message");
+        const recommendButton = document.getElementById("recommend-button");
+        const copyButton = document.getElementById("copy-button");
+        const dateLine = document.getElementById("date-line");
+        let currentMessage = "";
+
+        function pickMessage() {
+            if (messages.length === 1) {
+                return messages[0];
+            }
+
+            let nextMessage = currentMessage;
+            while (nextMessage === currentMessage) {
+                const index = Math.floor(Math.random() * messages.length);
+                nextMessage = messages[index];
+            }
+            return nextMessage;
+        }
+
+        function recommendMessage() {
+            currentMessage = pickMessage();
+            messageElement.textContent = currentMessage;
+            copyButton.textContent = "문구 복사하기";
+            copyButton.classList.remove("copied");
+        }
+
+        async function copyMessage() {
+            if (!currentMessage) {
+                return;
+            }
+
+            const copied = await copyText(currentMessage);
+            copyButton.textContent = copied ? "복사 완료" : "복사 실패";
+            copyButton.classList.toggle("copied", copied);
+
+            window.setTimeout(() => {
+                copyButton.textContent = "문구 복사하기";
+                copyButton.classList.remove("copied");
+            }, 1600);
+        }
+
+        async function copyText(text) {
+            if (navigator.clipboard && window.isSecureContext) {
+                try {
+                    await navigator.clipboard.writeText(text);
+                    return true;
+                } catch (error) {
+                    console.warn("Clipboard API failed, using fallback.", error);
+                }
+            }
+
+            return fallbackCopyText(text);
+        }
+
+        function fallbackCopyText(text) {
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            textArea.setAttribute("readonly", "");
+            textArea.style.position = "fixed";
+            textArea.style.top = "-1000px";
+            textArea.style.left = "-1000px";
+            document.body.appendChild(textArea);
+            textArea.select();
+
+            try {
+                return document.execCommand("copy");
+            } catch (error) {
+                console.warn("Fallback copy failed.", error);
+                return false;
+            } finally {
+                document.body.removeChild(textArea);
+            }
+        }
+
+        function setDateLine() {
+            const today = new Intl.DateTimeFormat("ko-KR", {
+                dateStyle: "full"
+            }).format(new Date());
+            dateLine.textContent = today;
+        }
+
+        recommendButton.addEventListener("click", recommendMessage);
+        copyButton.addEventListener("click", copyMessage);
+
+        setDateLine();
+        recommendMessage();
+    </script>
 </body>
 </html>
