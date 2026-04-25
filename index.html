@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>누군가에게 보내는 오늘의 편지</title>
+    <title>빈칸에게 보내는 오늘의 편지</title>
     <style>
         :root {
             --bg: #fff6f8;
@@ -177,6 +177,17 @@
             box-shadow: 12px 0 0 var(--accent-mint), 24px 0 0 var(--accent-lilac);
         }
 
+        .title-blank {
+            display: inline-block;
+            width: clamp(5.5rem, 20vw, 8.5rem);
+            height: 0.72em;
+            margin-right: 0.08em;
+            border-bottom: 6px solid var(--pink);
+            border-radius: 999px;
+            background: linear-gradient(90deg, var(--accent-yellow), var(--accent-mint), var(--accent-lilac));
+            vertical-align: -0.02em;
+        }
+
         h1 {
             position: relative;
             z-index: 1;
@@ -279,6 +290,17 @@
             font-weight: 700;
             line-height: 1.45;
             word-break: keep-all;
+        }
+
+        .name-blank {
+            display: inline-block;
+            width: clamp(4.5rem, 18vw, 7.5rem);
+            height: 0.72em;
+            margin: 0 0.12em;
+            border-bottom: 4px solid var(--pink);
+            border-radius: 999px;
+            background: linear-gradient(90deg, transparent, rgba(255, 228, 138, 0.75), transparent);
+            vertical-align: -0.02em;
         }
 
         .actions {
@@ -467,7 +489,7 @@
                     </div>
                 </div>
                 <div class="hero-note">daily tiny letter</div>
-                <h1>누군가에게 보내는 오늘의 편지</h1>
+                <h1><span class="title-blank" aria-label="빈칸"></span>에게 보내는 오늘의 편지</h1>
                 <p class="subtitle">받는 사람을 비워두거나 직접 적어서, 따뜻하게 전할 수 있는 한 문장을 골라줘요.</p>
             </header>
 
@@ -475,10 +497,10 @@
                 <div class="recipient-panel">
                     <label for="recipient-name">받는 사람</label>
                     <div class="recipient-row">
-                        <input id="recipient-name" type="text" autocomplete="off" placeholder="비워두면 누군가에게 보내는 문구로 추천돼요">
+                        <input id="recipient-name" type="text" autocomplete="off" placeholder="비워두면 빈칸으로 편지를 만들어요">
                         <button id="apply-recipient-button" type="button">적용</button>
                     </div>
-                    <p class="recipient-help">예: 엄마, 친구, 소중한 사람처럼 자유롭게 적을 수 있어요.</p>
+                    <p class="recipient-help">이름을 적으면 문장에 바로 들어가고, 비워두면 빈칸 편지로 남아요.</p>
                 </div>
 
                 <div class="message-box" aria-live="polite">
@@ -562,11 +584,32 @@
         let currentTemplate = "";
 
         function getRecipientName() {
-            return recipientNameInput.value.trim() || "누군가";
+            return recipientNameInput.value.trim();
         }
 
         function formatMessage(template) {
-            return template.replaceAll("{name}", getRecipientName());
+            return template.replaceAll("{name}", getRecipientName() || "_____");
+        }
+
+        function renderMessage(template) {
+            const recipientName = getRecipientName();
+            const parts = template.split("{name}");
+            messageElement.replaceChildren();
+
+            parts.forEach((part, index) => {
+                messageElement.append(document.createTextNode(part));
+
+                if (index < parts.length - 1) {
+                    if (recipientName) {
+                        messageElement.append(document.createTextNode(recipientName));
+                    } else {
+                        const blank = document.createElement("span");
+                        blank.className = "name-blank";
+                        blank.setAttribute("aria-label", "빈칸");
+                        messageElement.append(blank);
+                    }
+                }
+            });
         }
 
         function pickMessage() {
@@ -585,7 +628,7 @@
         function recommendMessage() {
             currentTemplate = pickMessage();
             currentMessage = formatMessage(currentTemplate);
-            messageElement.textContent = currentMessage;
+            renderMessage(currentTemplate);
             copyButton.textContent = "문구 복사하기";
             copyButton.classList.remove("copied");
         }
@@ -597,7 +640,7 @@
             }
 
             currentMessage = formatMessage(currentTemplate);
-            messageElement.textContent = currentMessage;
+            renderMessage(currentTemplate);
             copyButton.textContent = "문구 복사하기";
             copyButton.classList.remove("copied");
         }
