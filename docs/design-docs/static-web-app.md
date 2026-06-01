@@ -8,7 +8,7 @@ index.html
   -> owns inline app styling
   -> owns inline browser behavior
   -> renders the AI schedule analysis demo
-  -> parses numbered goals, builds deterministic analysis cards, and handles clipboard copy
+  -> parses numbered goals, builds deterministic analysis/resource cards, and handles clipboard copy
 style.css
   -> legacy/shared page styling, not currently the primary loaded style source
 main.js
@@ -21,6 +21,7 @@ main.js
 - Keep user-provided goal text rendered as plain text through DOM text APIs.
 - Keep global behavior small; split inline script/style only when file thresholds are crossed.
 - Keep the AI integration boundary isolated in `requestAiAnalysis` so a future API connection can replace demo logic without rewriting rendering.
+- Keep external resource recommendations as placeholders and search keywords until a real search/API integration is approved.
 
 ## Extension Points
 

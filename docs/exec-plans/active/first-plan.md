@@ -45,6 +45,7 @@ Create the minimum operating harness that lets agents modify this static web app
 | Add beginner setup docs and env example | Done | `README.md`, `.env.example` |
 | Add deployment configuration | Done | `render.yaml`, `frontend/vercel.json`, `docs/deployment/render-vercel.md` |
 | Add AI schedule analysis static demo | Done | `index.html`, product/design docs |
+| Expand AI schedule demo with resource research workflow | Done | `index.html`, product/design docs |
 
 ## Verification Commands
 
@@ -56,6 +57,7 @@ Latest local evidence:
 
 - Before change: `node scripts/harness-check.mjs` passed.
 - After change: `node scripts/harness-check.mjs` passed.
+- After resource workflow expansion: `node scripts/harness-check.mjs` passed.
 
 Deployment runs automatically on pushes to `main` through GitHub Actions.
 

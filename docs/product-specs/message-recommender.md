@@ -55,9 +55,10 @@ Primary flows:
 - User enters numbered daily goals.
 - User can load the built-in example goals.
 - The app parses goals locally and renders per-goal analysis cards.
-- Each goal includes interpretation, today actions, study/research methods, search keywords, priority, expected output, and expansion direction.
+- Each goal includes interpretation, execution direction, today actions, study routes, research keywords, resource recommendation placeholders, image guidance, priority, expected output, and expansion direction.
 - The app renders a combined morning/afternoon/evening/night plan.
-- User can copy the result as plain text or markdown.
+- The app renders a checklist and resource collection board for YouTube, blogs, papers, images, and other links.
+- User can copy the result as plain text or markdown/Notion-friendly structured text.
 
 Behavior requirements:
 
@@ -65,3 +66,5 @@ Behavior requirements:
 - Keep beginner-friendly Korean copy.
 - Keep output deterministic until a real AI API is approved.
 - Do not send user-entered goals to external APIs without a security review.
+- Do not invent URLs in the demo. Show “actual link connection planned” plus search keywords and recommended platforms until a search API is connected.
+- Future API seams may include OpenAI, YouTube Data API, Google Custom Search, SerpAPI/Tavily/Brave Search, Unsplash, Crossref, arXiv, Notion, and Google Calendar.
