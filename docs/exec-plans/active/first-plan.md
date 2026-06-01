@@ -46,6 +46,7 @@ Create the minimum operating harness that lets agents modify this static web app
 | Add deployment configuration | Done | `render.yaml`, `frontend/vercel.json`, `docs/deployment/render-vercel.md` |
 | Add AI schedule analysis static demo | Done | `index.html`, product/design docs |
 | Expand AI schedule demo with resource research workflow | Done | `index.html`, product/design docs |
+| Make AI schedule analysis the default repository work | Done | `AGENTS.md`, `docs/index.md`, product docs |
 
 ## Verification Commands
 

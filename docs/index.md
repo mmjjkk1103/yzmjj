@@ -6,10 +6,10 @@ This index points agents to the smallest reliable document set for a task.
 
 | Field | Value |
 | --- | --- |
-| Project | Family Encouragement Message Recommender |
-| Domain | Static web app for warm family encouragement messages |
+| Project | AI Schedule Analysis Studio |
+| Domain | Static AI schedule assistant for daily goals, study planning, research guidance, resource collection, and output planning |
 | Stack | HTML, CSS, inline browser JavaScript |
-| Repository state | Existing small static app |
+| Repository state | Root static app is the default product surface |
 | Deployment | To be confirmed; assume static hosting |
 | Security posture | No accounts, no server, no persistent storage |
 | Team size | To be confirmed; assume 1 human plus agents |

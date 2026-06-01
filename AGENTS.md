@@ -5,10 +5,10 @@ Detailed rules live in `docs/`.
 
 ## Project
 
-- Name: Family Encouragement Message Recommender
-- Product: Korean-first static web app for composing and copying warm family encouragement messages.
+- Name: AI Schedule Analysis Studio
+- Product: Korean-first static web app that turns daily goals into execution plans, study paths, research keywords, resource collection boards, and output-making guidance.
 - Runtime: Browser-only HTML/CSS/JavaScript.
-- Entry points: `index.html`, inline browser script, `style.css`, `news.json`.
+- Entry points: `index.html`, inline browser script, `style.css`.
 - Local check command: `node scripts/harness-check.mjs`.
 
 ## Human And Agent Roles
@@ -43,7 +43,7 @@ Detailed rules live in `docs/`.
 ## Repository Boundaries
 
 - Keep app code framework-free unless a plan explicitly approves a dependency.
-- Browser script in `index.html` currently owns behavior, event handling, news loading, and clipboard fallback.
+- Browser script in `index.html` currently owns goal parsing, demo analysis generation, result rendering, collection-board notes, and clipboard fallback.
 - `main.js` is legacy/unused unless `index.html` is changed to load it.
 - `style.css` owns shared page styling.
 - `index.html` owns document structure, metadata, and script/style wiring.
