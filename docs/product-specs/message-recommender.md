@@ -1,31 +1,37 @@
-# Product Spec: Message Recommender
+# Product Spec: AI Schedule Analysis Studio
 
 ## Product Purpose
 
-Help users quickly compose or choose warm encouragement messages for family members and copy them for sharing.
+Help Korean-first users turn vague daily goals into practical execution plans, study paths, research keywords, resource collection boards, and small concrete outputs.
 
 ## Primary Flows
 
-1. User opens the page and sees message options.
-2. User writes a custom message and submits it.
-3. The app adds the message as a card.
-4. User copies a message.
-5. The copy button gives short success or failure feedback.
+1. User opens the page and enters numbered daily goals.
+2. User chooses analysis depth, available time, and desired output type.
+3. The app parses each goal and renders deterministic demo analysis cards.
+4. The app provides execution direction, study routes, research keywords, resource placeholders, image guidance, daily plan, checklist, and resource board.
+5. User copies the result as plain text or markdown/Notion-friendly structured text.
 
 ## UX Requirements
 
 - Korean-first page metadata and visible copy are preferred.
 - The app must work on mobile and desktop.
-- Empty custom messages are rejected by focusing the input.
-- Message text must remain plain text.
+- Empty goal input is rejected by focusing the input.
+- User-entered goal text must remain plain text.
 - Copy failure must not break the page.
+- Demo resource recommendations must not invent real URLs.
+- Resource sections should show search keywords, recommended platforms, and “actual link connection planned” language until real search APIs are connected.
 
 ## Open Product Questions
 
-- Should default messages be Korean, English, or bilingual?
-- Should messages persist after refresh?
-- Should messages be categorized by recipient or mood?
+- Which API provider should supply real AI analysis first?
+- Which search provider should supply verified URLs first?
+- Should resource board notes persist after refresh?
 - Where will the app be deployed?
+
+## Legacy Product Track: Message Recommender
+
+The repository previously hosted a family encouragement message recommender. Treat that as legacy context unless a task explicitly asks to restore or maintain it.
 
 ## New MVP Product Track: Investment Hypothesis Research Engine
 
@@ -46,7 +52,7 @@ Required safety copy must stay visible in the UI:
 
 “본 서비스는 공개 공시, 재무제표, 뉴스 데이터를 기반으로 투자 아이디어를 정리하는 교육용·리서치 보조 도구입니다. 특정 종목의 매수·매도 추천, 목표가 제시, 투자자문 또는 투자일임을 제공하지 않습니다. 모든 투자 판단과 책임은 이용자 본인에게 있으며, 실제 투자 전에는 사업보고서, 공시, 재무제표, 산업 전망을 직접 확인해야 합니다.”
 
-## New Static Product Track: AI Schedule Analysis Studio
+## Default Static Product Track: AI Schedule Analysis Studio
 
 The root `index.html` now serves a Korean-first static demo for turning numbered daily goals into an execution plan. It is not connected to a real AI API yet.
 
