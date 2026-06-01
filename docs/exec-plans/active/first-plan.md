@@ -10,6 +10,7 @@ Create the minimum operating harness that lets agents modify this static web app
 - Add structured docs.
 - Add local harness check.
 - Define verification evidence and PR policy.
+- Add separate MVP full-stack financial research engine requested after the original harness work.
 
 ## Out Of Scope
 
@@ -39,12 +40,22 @@ Create the minimum operating harness that lets agents modify this static web app
 | Add security baseline | Done | `docs/security/security-baseline.md` |
 | Add local check script | Done | `scripts/harness-check.mjs` |
 | Add GitHub Pages deployment workflow | Done | `.github/workflows/deploy-pages.yml` |
+| Add financial research backend MVP | Done | `backend/app/` |
+| Add financial research frontend MVP | Done | `frontend/` |
+| Add beginner setup docs and env example | Done | `README.md`, `.env.example` |
+| Add deployment configuration | Done | `render.yaml`, `frontend/vercel.json`, `docs/deployment/render-vercel.md` |
+| Add AI schedule analysis static demo | Done | `index.html`, product/design docs |
 
 ## Verification Commands
 
 ```bash
 node scripts/harness-check.mjs
 ```
+
+Latest local evidence:
+
+- Before change: `node scripts/harness-check.mjs` passed.
+- After change: `node scripts/harness-check.mjs` passed.
 
 Deployment runs automatically on pushes to `main` through GitHub Actions.
 
