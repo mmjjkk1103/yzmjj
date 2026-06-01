@@ -4,14 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>오늘의 방향을 설계하는 AI</title>
-    <meta name="description" content="짧게 적은 오늘의 목표를 실행 방향, 공부 방법, 우선순위, 하루 계획으로 정리하는 AI 스케줄 분석 데모입니다.">
+    <meta name="description" content="짧게 적은 오늘의 목표를 실행 방향, 공부 방법, 참고 자료, 이미지 레퍼런스, 결과물 제작 방식으로 정리하는 AI 스케줄 분석 데모입니다.">
     <meta property="og:type" content="website">
     <meta property="og:title" content="오늘의 방향을 설계하는 AI">
-    <meta property="og:description" content="막연한 하루 목표를 실행 가능한 계획과 결과물로 바꿔드립니다.">
+    <meta property="og:description" content="막연한 하루 목표를 실행 가능한 계획, 학습 경로, 참고 자료, 결과물 제작 방식으로 바꿔드립니다.">
     <meta property="og:site_name" content="오늘의 방향을 설계하는 AI">
     <meta name="twitter:card" content="summary">
     <meta name="twitter:title" content="오늘의 방향을 설계하는 AI">
-    <meta name="twitter:description" content="짧게 적은 목표를 실행 가능한 계획으로 바꿔드립니다.">
+    <meta name="twitter:description" content="짧게 적은 목표를 실행 가능한 계획과 참고 자료로 바꿔드립니다.">
     <style>
         :root { --bg: #07111f; --panel: #101f33; --panel-strong: #142640; --text: #f6f9ff; --muted: #aebbd0; --subtle: #7f8da4; --line: rgba(214, 228, 255, 0.14); --line-strong: rgba(214, 228, 255, 0.24); --blue: #8ec5ff; --gray: #dbe4f0; --shadow: rgba(0, 0, 0, 0.28); --radius: 8px; }
         * { box-sizing: border-box; }
@@ -37,6 +37,10 @@
         .label-row, .result-head, .section-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
         label, .section-title { color: var(--text); font-weight: 900; }
         .field-note { color: var(--subtle); font-size: .88rem; }
+        .control-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 12px; }
+        .control-field { display: grid; gap: 7px; }
+        .control-field label { color: var(--muted); font-size: .84rem; }
+        .control-field select, .memo-input { width: 100%; border: 1px solid var(--line-strong); border-radius: var(--radius); color: var(--text); background: rgba(6, 16, 29, .78); padding: 11px 12px; }
         #goal-input { width: 100%; min-height: 330px; margin-top: 12px; border: 1px solid var(--line-strong); border-radius: var(--radius); color: var(--text); background: rgba(6, 16, 29, .78); line-height: 1.65; resize: vertical; padding: 16px; }
         #goal-input::placeholder { color: rgba(174, 187, 208, .78); }
         .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; }
@@ -56,6 +60,8 @@
         .result-head { align-items: start; margin-bottom: 14px; }
         .goal-title { margin: 0; color: var(--text); font-size: 1.24rem; line-height: 1.45; }
         .rank-badge { flex: 0 0 auto; border: 1px solid rgba(142,197,255,.28); border-radius: 999px; color: var(--blue); background: rgba(142,197,255,.08); font-size: .82rem; font-weight: 900; padding: 7px 10px; }
+        .meta-row { display: flex; flex-wrap: wrap; gap: 8px; margin: -4px 0 14px; }
+        .meta-chip { border: 1px solid var(--line); border-radius: 999px; color: var(--muted); background: rgba(255,255,255,.035); font-size: .82rem; padding: 6px 9px; }
         .section-list { display: grid; gap: 10px; }
         .analysis-section { display: grid; gap: 8px; border-top: 1px solid var(--line); padding-top: 12px; }
         .analysis-section:first-child { border-top: 0; padding-top: 0; }
@@ -65,6 +71,15 @@
         ul { margin: 0; padding-left: 20px; }
         .keyword-row { display: flex; flex-wrap: wrap; gap: 8px; }
         .keyword { border: 1px solid var(--line); border-radius: 999px; color: var(--gray); background: rgba(255,255,255,.04); font-size: .88rem; padding: 7px 10px; }
+        .resource-grid, .board-grid, .check-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+        .resource-card, .board-card, .check-card { border: 1px solid var(--line); border-radius: var(--radius); background: rgba(255,255,255,.035); padding: 12px; }
+        .resource-card h4, .board-card h3, .check-card h3 { margin: 0 0 8px; color: var(--blue); font-size: .95rem; }
+        .resource-card p, .board-card p, .check-card li { margin: 0; color: var(--gray); line-height: 1.55; font-size: .93rem; }
+        .resource-card p + p, .board-card p + p { margin-top: 6px; }
+        .link-placeholder { color: var(--subtle); }
+        .question-list { counter-reset: question; list-style: none; padding-left: 0; }
+        .question-list li { counter-increment: question; }
+        .question-list li::before { content: counter(question) ". "; color: var(--blue); font-weight: 900; }
         .plan-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 14px; }
         .plan-block { border: 1px solid var(--line); border-radius: var(--radius); background: rgba(255,255,255,.035); padding: 14px; }
         .plan-block h3 { margin: 0 0 8px; color: var(--blue); font-size: 1rem; }
@@ -72,7 +87,7 @@
         .summary-card { display: grid; gap: 10px; border-color: rgba(142,197,255,.22); background: rgba(20,38,64,.9); }
         .hidden-compat { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
         @media (max-width: 840px) { .page { width: min(100% - 28px, 720px); padding-top: 18px; } .workspace { grid-template-columns: 1fr; } .input-card { position: static; } #goal-input { min-height: 260px; } }
-        @media (max-width: 560px) { .topbar, .label-row, .result-head, .section-heading { align-items: flex-start; flex-direction: column; } .status-pill { white-space: normal; } .actions, .result-tools, .result-tools.visible, .mini-grid, .plan-grid { grid-template-columns: 1fr; } .empty-state, .insight-card, .plan-card, .summary-card, .input-card { padding: 16px; } }
+        @media (max-width: 560px) { .topbar, .label-row, .result-head, .section-heading { align-items: flex-start; flex-direction: column; } .status-pill { white-space: normal; } .actions, .result-tools, .result-tools.visible, .mini-grid, .plan-grid, .control-grid, .resource-grid, .board-grid, .check-grid { grid-template-columns: 1fr; } .empty-state, .insight-card, .plan-card, .summary-card, .input-card { padding: 16px; } }
     </style>
 </head>
 <body>
@@ -84,18 +99,51 @@
         <section class="hero" aria-labelledby="page-title">
             <p class="eyebrow">AI 비서 + 개인 연구실 + 하루 계획표</p>
             <h1 id="page-title">오늘의 방향을 설계하는 AI</h1>
-            <p class="subtitle">짧게 적은 목표를 실행 가능한 계획으로 바꿔드립니다. 막연한 생각을 목표 해석, 실행 방법, 공부 방향, 우선순위, 결과물로 정리합니다.</p>
+            <p class="subtitle">짧게 적은 목표를 실행 가능한 계획과 참고 자료로 바꿔드립니다. 막연한 생각을 학습 경로, 자료 조사 키워드, 이미지 레퍼런스, 결과물 제작 방식까지 정리합니다.</p>
         </section>
         <section class="workspace" aria-label="목표 분석 작업 영역">
             <section class="card input-card" aria-label="오늘 목표 입력">
                 <div class="label-row"><label for="goal-input">오늘 하루 목표</label><span class="field-note">번호 목록을 그대로 붙여넣어도 됩니다</span></div>
-                <textarea id="goal-input" placeholder="예: 1. 바이브 코딩 강의 알아보기&#10;2. 영화 기반 인문학 공부 방향 정리&#10;3. 유튜브 촬영 기획 세우기"></textarea>
+                <textarea id="goal-input" placeholder="예:&#10;1. 바이브 코딩 강의와 자격증 알아보기&#10;2. 영화를 기반으로 인문학자가 되는 공부 방향 찾기&#10;3. 영화 속 장면을 찾아가는 여행 유튜브 촬영 기획하기"></textarea>
+                <div class="control-grid" aria-label="분석 옵션">
+                    <div class="control-field">
+                        <label for="depth-select">난이도</label>
+                        <select id="depth-select">
+                            <option value="가볍게">가볍게</option>
+                            <option value="보통" selected>보통</option>
+                            <option value="깊게">깊게</option>
+                            <option value="전문가처럼">전문가처럼</option>
+                        </select>
+                    </div>
+                    <div class="control-field">
+                        <label for="time-select">사용 시간</label>
+                        <select id="time-select">
+                            <option value="1시간">1시간</option>
+                            <option value="3시간">3시간</option>
+                            <option value="반나절">반나절</option>
+                            <option value="하루 전체" selected>하루 전체</option>
+                            <option value="일주일 계획">일주일 계획</option>
+                        </select>
+                    </div>
+                    <div class="control-field">
+                        <label for="output-select">결과물 유형</label>
+                        <select id="output-select">
+                            <option value="공부 계획">공부 계획</option>
+                            <option value="글쓰기">글쓰기</option>
+                            <option value="유튜브 기획">유튜브 기획</option>
+                            <option value="리서치" selected>리서치</option>
+                            <option value="발표 준비">발표 준비</option>
+                            <option value="프로젝트 기획">프로젝트 기획</option>
+                            <option value="포트폴리오 제작">포트폴리오 제작</option>
+                        </select>
+                    </div>
+                </div>
                 <div class="actions">
                     <button class="primary-button" id="analyze-button" type="button">분석하기</button>
-                    <button class="secondary-button" id="example-button" type="button">예시 목표 불러오기</button>
-                    <button class="secondary-button" id="reset-button" type="button">다시 분석하기</button>
+                    <button class="secondary-button" id="example-button" type="button">예시 불러오기</button>
+                    <button class="secondary-button" id="reset-button" type="button">결과 초기화</button>
                 </div>
-                <p class="input-tip">현재 버전은 실제 AI API를 호출하지 않고, 입력 문장을 규칙 기반으로 분석하는 데모입니다. 나중에 API 연결 시 requestAiAnalysis 함수만 교체하면 됩니다.</p>
+                <p class="input-tip">데모 버전은 실제 링크를 만들지 않습니다. 유튜브, 블로그, 논문, 이미지 자료는 검색 키워드와 추천 플랫폼 중심으로 표시하며, 실제 API 연결 후 URL과 출처를 붙일 수 있습니다.</p>
             </section>
             <section class="results" aria-live="polite">
                 <div class="result-tools" id="result-tools">
@@ -107,7 +155,7 @@
                     <p>목표가 많으면 오늘 안에 끝낼 항목과 보류할 항목을 나눕니다. 실행 가능성이 낮은 목표는 더 작은 행동 단위로 쪼개서 제안합니다.</p>
                     <div class="mini-grid" aria-label="분석 기준"><div class="mini-cell">핵심 의도와 프로젝트 성격 구분</div><div class="mini-cell">오늘, 이번 주, 장기 방향 분리</div><div class="mini-cell">공부법, 조사법, 결과물 제안</div></div>
                 </section>
-                <div id="summary-output"></div><div id="analysis-output"></div><div id="daily-plan-output"></div>
+                <div id="summary-output"></div><div id="analysis-output"></div><div id="daily-plan-output"></div><div id="checklist-output"></div><div id="board-output"></div>
             </section>
         </section>
         <section class="hidden-compat" aria-hidden="true"><p id="message"></p><input id="recipient-name" type="text" tabindex="-1"><button id="recommend-button" type="button" tabindex="-1">compat</button><div id="news-list"></div><form id="partnership-form"></form></section>
@@ -118,6 +166,9 @@
 3. 유튜브 촬영을 위한 명확한 계획 세우기, 영화 속 장면을 찾아가는 여행 유튜브 컨셉 기획하기`;
         const state = { lastMarkdown: "", lastPlainText: "" };
         const input = document.querySelector("#goal-input");
+        const depthSelect = document.querySelector("#depth-select");
+        const timeSelect = document.querySelector("#time-select");
+        const outputSelect = document.querySelector("#output-select");
         const analyzeButton = document.querySelector("#analyze-button");
         const exampleButton = document.querySelector("#example-button");
         const resetButton = document.querySelector("#reset-button");
@@ -128,9 +179,11 @@
         const summaryOutput = document.querySelector("#summary-output");
         const analysisOutput = document.querySelector("#analysis-output");
         const dailyPlanOutput = document.querySelector("#daily-plan-output");
+        const checklistOutput = document.querySelector("#checklist-output");
+        const boardOutput = document.querySelector("#board-output");
 
-        // 실제 AI API 연결 시 이 함수 내부를 fetch 호출로 교체하면 됩니다.
-        async function requestAiAnalysis(rawInput) { const goals = parseGoals(rawInput); return buildDemoAnalysis(goals); }
+        // 실제 AI API 연결 시 이 함수 내부를 OpenAI, 검색, 유튜브, 이미지, 논문 API 호출로 교체하면 됩니다.
+        async function requestAiAnalysis(rawInput, options) { const goals = parseGoals(rawInput); return buildDemoAnalysis(goals, options); }
         function parseGoals(rawInput) {
             const normalized = rawInput.trim(); if (!normalized) return [];
             const lines = normalized.split(/\n+/).map((line) => line.trim()).filter(Boolean);
@@ -144,25 +197,88 @@
             });
             if (current) goals.push(current.trim()); return goals.filter(Boolean);
         }
-        function buildDemoAnalysis(goals) { return { goals: goals.map((goal, index) => analyzeGoal(goal, index, goals.length)), plan: buildDailyPlan(goals), summary: buildSummary(goals) }; }
-        function analyzeGoal(goal, index, total) { const type = detectGoalType(goal); const priority = assignPriority(index, total, type); return { title: goal, priority, intent: buildIntent(goal, type), today: buildTodayActions(type, priority), study: buildStudyGuide(type), keywords: buildKeywords(goal, type), priorityText: buildPriorityText(priority, type), output: buildExpectedOutput(type), expansion: buildExpansion(type) }; }
-        function detectGoalType(goal) { const text = goal.toLowerCase(); if (/유튜브|촬영|영상|콘텐츠|기획|여행/.test(text)) return "content"; if (/영화|인문|연구|분석|공부|학자/.test(text)) return "study"; if (/강의|자격증|코딩|ai|바이브|개발/.test(text)) return "course"; return "general"; }
+        function buildDemoAnalysis(goals, options) {
+            const analyzedGoals = goals.map((goal, index) => analyzeGoal(goal, index, goals.length, options));
+            return {
+                goals: analyzedGoals,
+                plan: buildDailyPlan(goals, options),
+                summary: buildSummary(analyzedGoals, options),
+                checklist: buildChecklist(analyzedGoals),
+                board: buildResourceBoard(analyzedGoals),
+                options
+            };
+        }
+        function analyzeGoal(goal, index, total, options) {
+            const type = detectGoalType(goal);
+            const priority = assignPriority(index, total, type);
+            return {
+                title: goal,
+                type,
+                category: categoryName(type),
+                priority,
+                intent: buildIntent(goal, type),
+                execution: buildExecution(type, priority, options),
+                today: buildTodayActions(type, priority),
+                study: buildStudyGuide(type, options),
+                research: buildResearchGuide(goal, type),
+                resources: buildResourceRecommendations(type),
+                imageGuide: buildImageGuide(type),
+                questions: buildCoreQuestions(type),
+                priorityText: buildPriorityText(priority, type),
+                output: buildExpectedOutput(type, options),
+                expansion: buildExpansion(type)
+            };
+        }
+        function detectGoalType(goal) { const text = goal.toLowerCase(); if (/유튜브|촬영|영상|콘텐츠|기획|여행|콘티/.test(text)) return "content"; if (/영화|인문|연구|분석|공부|학자|논문/.test(text)) return "study"; if (/강의|자격증|코딩|ai|바이브|개발|프로그래밍/.test(text)) return "course"; if (/업무|보고|회의|제안|정리/.test(text)) return "work"; return "project"; }
+        function categoryName(type) { return { course: "공부/자기계발", study: "조사/연구", content: "콘텐츠 제작", work: "업무", project: "프로젝트 기획" }[type]; }
         function assignPriority(index, total, type) { if (total >= 5 && index >= 3) return "보류"; if (index === 0 || type === "course") return "1순위"; if (index === 1) return "2순위"; return total > 3 ? "보류" : "2순위"; }
-        function buildIntent(goal, type) { const base = { course: "정보 수집 자체보다, 어떤 학습 경로가 시간 대비 가장 현실적인지 판단하려는 목표입니다. 오늘은 결제나 등록보다 비교 기준을 만드는 일이 먼저입니다.", study: "장기 연구 주제를 만들기 위한 탐색 목표입니다. 하루 안에 결론을 내기보다, 영화와 인문학을 연결하는 질문 목록을 만드는 것이 핵심입니다.", content: "아이디어를 실행 가능한 영상 프로젝트로 바꾸려는 목표입니다. 오늘은 촬영보다 컨셉, 장소 후보, 첫 편의 구성안을 좁히는 일이 중요합니다.", general: "막연한 생각을 다음 행동으로 바꾸려는 목표입니다. 오늘 끝낼 일과 이번 주에 이어갈 일을 분리해야 합니다." }; return `${base[type]} 입력한 목표 "${goal}"는 단순 할 일이라기보다 작은 기획 단계에 가깝습니다.`; }
-        function buildTodayActions(type, priority) { const common = priority === "보류" ? ["오늘은 20분만 써서 링크 3개와 질문 3개를 남기고 멈춥니다.", "핵심 목표가 끝난 뒤 여유가 있을 때만 이어갑니다."] : ["25분 단위로 첫 조사를 시작합니다.", "조사한 내용을 바로 한 문장 요약으로 남깁니다.", "마지막 10분에 내일 이어갈 질문을 적습니다."]; const byType = { course: ["강의 후보 5개를 모으고 가격, 난이도, 결과물을 같은 기준으로 비교합니다.", "자격증은 필요성, 인정 범위, 준비 기간을 먼저 확인합니다."], study: ["영화 한 편 또는 감독 한 명으로 범위를 줄입니다.", "인문학 키워드 3개를 정하고 각 키워드가 영화 장면과 어떻게 연결되는지 메모합니다."], content: ["유튜브 첫 영상의 제목 후보 5개를 씁니다.", "장소 후보, 필요한 장면, 촬영 동선을 한 페이지로 정리합니다."], general: ["목표를 조사, 정리, 실행, 결과물 단계로 나눕니다.", "가장 작은 시작 행동 하나를 정합니다."] }; return byType[type].concat(common); }
-        function buildStudyGuide(type) { const guides = { course: ["초보자라면 강의 목차에서 프로젝트 결과물이 있는지 먼저 봅니다. 결과물이 있어야 하루 공부가 포트폴리오로 이어집니다.", "자격증은 채용, 프리랜서, 개인 프로젝트 중 어떤 목적에 쓰일지 정한 뒤 필요 여부를 판단합니다.", "유튜브 후기보다 공식 커리큘럼, 수강생 결과물, 업데이트 날짜를 함께 확인합니다."], study: ["영화 이론, 문화연구, 철학 입문서를 동시에 넓게 훑되 오늘은 한 장면을 분석하는 연습부터 시작합니다.", "논문은 결론부터 읽고, 모르는 개념은 별도 용어장으로 빼서 정리합니다.", "초보자라면 어려운 원전보다 해설서와 강의로 큰 지도를 먼저 잡는 편이 현실적입니다."], content: ["비슷한 여행 유튜브 5개를 보고 제목, 첫 30초, 장소 소개 방식, 엔딩을 표로 비교합니다.", "영화 속 장소는 공식 관광 자료, 촬영지 블로그, 지도 리뷰를 함께 확인해야 실제 이동 가능성을 판단할 수 있습니다.", "기획안은 거창하게 쓰기보다 한 편을 찍을 수 있는 체크리스트로 시작합니다."], general: ["먼저 관련 자료를 넓게 모으고, 그다음 실행 가능성 기준으로 줄입니다.", "초보자라면 전문 용어보다 예시, 입문 강의, 체크리스트형 자료부터 보는 것이 좋습니다."] }; return guides[type]; }
-        function buildKeywords(goal, type) { const words = goal.split(/\s+/).map((word) => word.replace(/[^\w가-힣]/g, "")).filter((word) => word.length >= 2); const uniqueWords = Array.from(new Set(words)).slice(0, 3); const byType = { course: ["AI 코딩 입문 강의", "프롬프트 엔지니어링 자격증", "노코드 자동화 포트폴리오", "강의 커리큘럼 비교"], study: ["영화 인문학 입문", "영화 이론 문화연구", "장면 분석 방법", "인문학 연구 질문 만들기"], content: ["영화 촬영지 여행 유튜브", "여행 유튜브 기획안", "로케이션 리서치 방법", "첫 영상 콘티 작성"], general: ["초보자 실행 계획", "자료 조사 방법", "하루 계획표 만들기", "프로젝트 우선순위"] }; return Array.from(new Set(uniqueWords.concat(byType[type]))).slice(0, 7); }
+        function buildIntent(goal, type) { const base = { course: "정보 수집 자체보다, 어떤 학습 경로가 시간 대비 가장 현실적인지 판단하려는 목표입니다. 오늘은 결제나 등록보다 비교 기준을 만드는 일이 먼저입니다.", study: "장기 연구 주제를 만들기 위한 탐색 목표입니다. 하루 안에 결론을 내기보다, 영화와 인문학을 연결하는 질문 목록을 만드는 것이 핵심입니다.", content: "아이디어를 실행 가능한 영상 프로젝트로 바꾸려는 목표입니다. 오늘은 촬영보다 컨셉, 장소 후보, 첫 편의 구성안을 좁히는 일이 중요합니다.", work: "업무 결과물을 만들기 위한 정리 목표입니다. 자료를 더 모으기보다 의사결정에 필요한 초안을 만드는 일이 먼저입니다.", project: "막연한 생각을 다음 행동으로 바꾸려는 목표입니다. 오늘 끝낼 일과 이번 주에 이어갈 일을 분리해야 합니다." }; return `${base[type]} 입력한 목표 "${goal}"는 단순 할 일이라기보다 작은 기획 단계에 가깝습니다.`; }
+        function buildTodayActions(type, priority) { const common = priority === "보류" ? ["오늘은 20분만 써서 링크 3개와 질문 3개를 남기고 멈춥니다.", "핵심 목표가 끝난 뒤 여유가 있을 때만 이어갑니다."] : ["25분 단위로 첫 조사를 시작합니다.", "조사한 내용을 바로 한 문장 요약으로 남깁니다.", "마지막 10분에 내일 이어갈 질문을 적습니다."]; const byType = { course: ["강의 후보 5개를 모으고 가격, 난이도, 결과물을 같은 기준으로 비교합니다.", "자격증은 필요성, 인정 범위, 준비 기간을 먼저 확인합니다."], study: ["영화 한 편 또는 감독 한 명으로 범위를 줄입니다.", "인문학 키워드 3개를 정하고 각 키워드가 영화 장면과 어떻게 연결되는지 메모합니다."], content: ["유튜브 첫 영상의 제목 후보 5개를 씁니다.", "장소 후보, 필요한 장면, 촬영 동선을 한 페이지로 정리합니다."], work: ["업무 목적, 마감, 공유 대상부터 적습니다.", "보고서나 제안서 목차를 먼저 만들고 자료를 끼워 넣습니다."], project: ["목표를 조사, 정리, 실행, 결과물 단계로 나눕니다.", "가장 작은 시작 행동 하나를 정합니다."] }; return byType[type].concat(common); }
+        function buildExecution(type, priority, options) { const minimum = priority === "보류" ? "링크 3개, 질문 3개, 다음 행동 1개만 남깁니다." : "비교표 1개 또는 기획 메모 1페이지를 완성합니다."; return [`오늘 바로 할 행동: ${minimum}`, `이번 주 행동: ${options.depth} 수준에 맞춰 핵심 자료 2개를 실제로 보고 요약합니다.`, "장기 방향: 자료 수집, 실험, 결과물 제작을 반복 가능한 템플릿으로 만듭니다.", "시간이 부족하면 새 자료를 더 찾지 말고 이미 찾은 자료를 기준표로 정리합니다."]; }
+        function buildStudyGuide(type, options) { const guides = { course: ["초보자 루트: 용어 정리 → 입문 강의 목차 확인 → 작은 실습 1개 실행.", "중급자 루트: 강의별 프로젝트 결과물 비교 → 자동화/AI 도구 워크플로우 분석.", "실전 루트: 오늘 찾은 강의 중 1개를 20분만 들어보고 결과물 난이도를 기록합니다."], study: ["초보자 루트: 영화 한 편 선택 → 장면 3개 기록 → 인문학 키워드 3개 연결.", "중급자 루트: 영화 이론, 문화연구, 철학 개념을 나누어 읽고 질문 목록을 만듭니다.", "실전 루트: 한 장면을 역사, 철학, 미학 관점으로 각각 5줄 분석합니다."], content: ["초보자 루트: 유사 채널 5개 분석 → 영상 제목 구조 기록 → 첫 편 콘셉트 작성.", "중급자 루트: 장소 조사, 이동 동선, 촬영 컷, 저작권 리스크를 한 표에 정리합니다.", "실전 루트: 3분 파일럿 영상의 오프닝, 본문, 엔딩을 콘티로 씁니다."], work: ["초보자 루트: 요구사항, 이해관계자, 마감 시간을 먼저 정리합니다.", "중급자 루트: 보고서나 제안서의 목차를 먼저 만들고 자료를 끼워 넣습니다.", "실전 루트: 1페이지 초안을 만들고 부족한 근거만 추가 조사합니다."], project: ["초보자 루트: 목표를 조사, 실행, 검증, 결과물 단계로 나눕니다.", "중급자 루트: 우선순위와 리스크를 적고 이번 주 실험 항목을 정합니다.", "실전 루트: 바로 공유 가능한 로드맵 또는 체크리스트를 만듭니다."] }; return guides[type].concat([`선택한 깊이: ${options.depth}. 너무 깊게 시작하면 완료가 어려우므로 오늘은 결과물 중심으로 마감합니다.`]); }
+        function buildResearchGuide(goal, type) {
+            const baseWords = goal.split(/\s+/).map((word) => word.replace(/[^\w가-힣]/g, "")).filter((word) => word.length >= 2).slice(0, 3);
+            const presets = {
+                course: { ko: ["AI 코딩 입문 강의", "바이브 코딩 자격증", "AI 개발 포트폴리오"], en: ["AI coding course", "prompt engineering certification", "AI assisted programming workflow"], youtube: ["AI 코딩 튜토리얼", "Cursor 사용법", "프롬프트 엔지니어링 입문"], blog: ["AI 코딩 강의 후기", "개발 포트폴리오 만드는 법"], paper: ["human AI pair programming", "AI assisted software development"], image: ["AI coding workspace", "code editor workflow", "developer desk setup"] },
+                study: { ko: ["영화 인문학", "영화 장면 분석", "인문학 연구 방법"], en: ["film studies humanities", "film scene analysis", "visual culture research"], youtube: ["영화 인문학 강연", "영화 이론 입문", "철학 영화 해석"], blog: ["영화 인문학 브런치", "영화 분석 글쓰기"], paper: ["film studies", "visual culture", "cinema philosophy"], image: ["film still analysis", "research notes desk", "archive photography"] },
+                content: { ko: ["영화 촬영지 여행 유튜브", "여행 유튜브 기획안", "촬영 콘티 작성"], en: ["film location travel vlog", "travel vlog storyboard", "location scouting guide"], youtube: ["여행 유튜브 기획", "촬영지 브이로그", "스토리텔링 유튜브"], blog: ["여행 유튜브 기획안", "촬영지 답사 후기"], paper: ["tourism storytelling", "media induced tourism"], image: ["location scouting", "travel storyboard", "map itinerary design"] },
+                work: { ko: ["업무 계획표", "자료 조사 보고서", "프로젝트 우선순위"], en: ["work planning template", "research brief", "project prioritization"], youtube: ["업무 정리 방법", "리서치 보고서 작성"], blog: ["보고서 작성법", "업무 우선순위 정리"], paper: ["knowledge work planning", "task prioritization"], image: ["planning board", "research dashboard"] },
+                project: { ko: ["프로젝트 기획", "리서치 방법", "실행 체크리스트"], en: ["project planning", "research workflow", "execution checklist"], youtube: ["프로젝트 기획 방법", "자료 조사 방법"], blog: ["프로젝트 로드맵", "리서치 노트"], paper: ["project based learning", "planning methodology"], image: ["project roadmap", "research board"] }
+            };
+            const selected = presets[type];
+            return { korean: Array.from(new Set(baseWords.concat(selected.ko))), english: selected.en, youtube: selected.youtube, blog: selected.blog, paper: selected.paper, image: selected.image };
+        }
+        function buildResourceRecommendations(type) {
+            const resources = {
+                youtube: { title: "유튜브 자료", platform: "YouTube", link: "실제 링크 연결 예정", reason: "입문용, 개념 이해용, 실전 튜토리얼, 사례 분석 영상을 분리해서 볼 수 있습니다.", questions: ["영상이 해결하는 문제는 무엇인가?", "따라 해볼 수 있는 최소 실습은 무엇인가?", "내 목표에 바로 적용할 부분은 무엇인가?"] },
+                blog: { title: "블로그/웹사이트 자료", platform: "브런치, 네이버 포스트, 개인 블로그", link: "검색 키워드 기반 추천 예정", reason: "개인 경험담, 실전 사례, 프로젝트 적용 팁을 빠르게 훑기 좋습니다.", points: ["초보자가 이해할 수 있는 설명인지", "사례나 템플릿이 있는지", "작성 시점과 신뢰도를 확인할 것"] },
+                official: { title: "공식 자료", platform: "공식 문서, 교육기관, 도구 홈페이지", link: "공식 URL 검색 연결 예정", reason: "강의, 도구, 데이터의 최신성과 정확성을 확인하는 기준점입니다." },
+                course: { title: "강의 사이트", platform: "인프런, 클래스101, Coursera, edX, Udemy", link: "실제 강의 검색 연결 예정", reason: "커리큘럼, 난이도, 결과물을 비교해 학습 경로를 정할 수 있습니다." },
+                paper: { title: "논문/리포트", platform: "Google Scholar, RISS, DBpia, KCI, arXiv", link: "실제 검색 기반일 때만 제목과 DOI 표시", reason: "주장을 뒷받침할 개념, 선행 연구, 공식 리포트를 찾는 데 필요합니다." },
+                image: { title: "이미지 참고 사이트", platform: "Unsplash, Pexels, Pixabay, Wikimedia Commons, Pinterest", link: "이미지 검색어 추천 중심", reason: "썸네일, 발표자료, 기획서, 카드뉴스의 시각 방향을 잡을 수 있습니다." },
+                community: { title: "커뮤니티/포럼", platform: type === "course" ? "GitHub, Reddit, Stack Overflow, 개발자 커뮤니티" : "Reddit, 네이버 카페, 분야별 커뮤니티", link: "커뮤니티 검색 연결 예정", reason: "실제 사용자 질문과 시행착오를 확인해 현실성을 점검할 수 있습니다." }
+            };
+            return Object.values(resources);
+        }
+        function buildImageGuide(type) { const guides = { course: ["개발 환경, 코드 에디터, AI 코딩 도구 화면, 워크플로우 다이어그램", "Unsplash/Pexels는 자유 활용 후보, Google Images/Pinterest는 라이선스 확인 필요", "활용: 발표자료, 공부 계획표, 포트폴리오 커버"], study: ["영화 스틸컷, 철학자 이미지, 책 표지, 연구 노트, 아카이브 이미지", "영화 스틸컷과 책 표지는 저작권 확인 필요, Wikimedia Commons는 라이선스 조건 확인", "활용: 연구 노트, 인스타그램 카드뉴스, 발표자료"], content: ["로케이션 사진, 촬영 콘티, 지도 이미지, 여행 동선, 영화 장면 비교 이미지", "직접 촬영 사진은 활용성이 높고, 영화 장면 비교는 저작권 확인 필요", "활용: 썸네일, 촬영 기획서, 영상 콘티, 여행 동선 지도"], work: ["업무 보드, 대시보드, 리서치 표, 회의 노트 이미지", "상업용 템플릿 이미지는 라이선스 확인 필요", "활용: 보고서, 발표자료, 제안서"], project: ["프로젝트 로드맵, 무드보드, 자료 조사 보드, 일정표", "무료 이미지도 출처와 라이선스를 확인하고 기록", "활용: Notion 페이지, 발표자료, 프로젝트 문서"] }; return guides[type]; }
+        function buildCoreQuestions(type) { const questions = { course: ["이 자격증이나 강의가 실제 목표에 필요한가?", "완료 후 손에 남는 결과물은 무엇인가?", "오늘 결제하지 않고도 검증할 방법은 무엇인가?"], study: ["내가 답하고 싶은 인문학 질문은 무엇인가?", "어떤 영화 장면이 그 질문을 가장 잘 보여주는가?", "초보자가 이해할 수 있게 설명하려면 어떤 자료가 필요한가?"], content: ["첫 영상에서 시청자가 바로 이해할 한 문장은 무엇인가?", "촬영 가능한 장소와 불가능한 장소는 무엇인가?", "영상이 끝났을 때 남길 감정이나 정보는 무엇인가?"], work: ["오늘 반드시 결정해야 하는 것은 무엇인가?", "자료가 부족해도 만들 수 있는 초안은 무엇인가?", "누구에게 공유할 결과물인가?"], project: ["오늘 만들 최소 결과물은 무엇인가?", "나중으로 미뤄도 되는 조사는 무엇인가?", "다음 행동을 검증하는 기준은 무엇인가?"] }; return questions[type]; }
         function buildPriorityText(priority, type) { const energy = type === "study" ? "에너지 높음" : type === "content" ? "에너지 중간" : "에너지 낮음"; if (priority === "보류") return `오늘 다 끝내기 어렵습니다. ${energy} 항목이므로 핵심 목표를 끝낸 뒤 자료 링크만 남기는 보류 작업으로 두는 편이 현실적입니다.`; if (priority === "1순위") return `오늘 가장 먼저 처리할 항목입니다. ${energy} 작업이지만, 기준표나 후보 목록처럼 작은 결과물로 끝내면 부담이 줄어듭니다.`; return `중요하지만 첫 번째 목표 뒤에 배치하는 편이 좋습니다. ${energy} 작업이므로 오후 집중 시간에 60분만 깊게 다루는 것을 권합니다.`; }
-        function buildExpectedOutput(type) { const outputs = { course: "강의 후보 비교표 1개, 자격증 필요성 메모 1개, 다음 결정을 위한 체크리스트", study: "영화 기반 인문학 연구 질문 5개, 읽을 자료 링크 목록, 한 장면 분석 노트", content: "유튜브 첫 편 기획안, 촬영지 후보 목록, 제목 후보와 오프닝 멘트 초안", general: "자료 링크 목록, 실행 체크리스트, 내일 이어갈 질문 3개" }; return outputs[type]; }
-        function buildExpansion(type) { const expansions = { course: "이번 주에는 한 강의를 1강만 실제로 들어보고 난이도와 결과물의 품질을 확인하세요. 장기적으로는 작은 자동화 프로젝트를 만들어 포트폴리오로 남기는 방향이 좋습니다.", study: "이번 주에는 영화 한 편을 정해 역사, 철학, 미학 관점으로 각각 한 문단씩 분석해보세요. 장기적으로는 주제별 독서 목록과 장면 아카이브를 만들면 연구 습관이 생깁니다.", content: "이번 주에는 3분짜리 파일럿 영상을 먼저 찍어보세요. 장기적으로는 영화 속 장소, 이야기, 이동 경로를 반복 포맷으로 만들어 시리즈화할 수 있습니다.", general: "이번 주에는 오늘 만든 체크리스트를 다시 보고 반복 가능한 루틴으로 줄이세요. 장기적으로는 결과물 중심의 작은 프로젝트 단위로 관리하는 편이 좋습니다." }; return expansions[type]; }
-        function buildSummary(goals) { if (goals.length === 0) return ""; if (goals.length >= 4) return `목표가 ${goals.length}개라서 오늘 모두 깊게 처리하기는 어렵습니다. 1순위와 2순위만 실제 결과물까지 만들고, 나머지는 링크 수집이나 질문 정리 수준으로 보류하는 편이 현실적입니다.`; return `목표가 ${goals.length}개라면 오늘 안에 모두 건드릴 수는 있지만, 모든 항목을 완성하려고 하면 집중도가 떨어집니다. 오전에는 넓게 조사하고 오후에는 가장 중요한 하나를 깊게 파는 구성이 적합합니다.`; }
-        function buildDailyPlan(goals) { const mainGoal = goals[0] || "가장 중요한 목표"; return [{ time: "오전", text: `가볍게 조사하고 자료를 모읍니다. ${mainGoal}에 필요한 링크와 후보를 먼저 수집하고, 판단 기준을 3개만 정합니다.` }, { time: "오후", text: "핵심 목표 하나를 깊게 파고듭니다. 자료를 계속 모으기보다 비교표, 연구 질문, 기획안 중 하나를 실제 문서로 만듭니다." }, { time: "저녁", text: "정리하고 결과물을 만듭니다. 오늘 모은 링크를 버릴 것과 남길 것으로 나누고, 내일 이어갈 질문을 적습니다." }, { time: "밤", text: "내일 할 일로 이어갑니다. 무리해서 새 작업을 시작하지 말고, 가장 작은 다음 행동 1개만 캘린더나 메모에 남깁니다." }]; }
-        function analyzeInput() { const rawInput = input.value.trim(); if (!rawInput) { input.focus(); return; } analyzeButton.textContent = "분석 중..."; analyzeButton.disabled = true; requestAiAnalysis(rawInput).then((analysis) => { renderAnalysis(analysis); state.lastMarkdown = buildMarkdown(analysis); state.lastPlainText = state.lastMarkdown.replace(/[#*`]/g, ""); resultTools.classList.add("visible"); emptyState.style.display = "none"; }).finally(() => { analyzeButton.textContent = "분석하기"; analyzeButton.disabled = false; }); }
-        function renderAnalysis(analysis) { clearElement(summaryOutput); clearElement(analysisOutput); clearElement(dailyPlanOutput); const summaryCard = createElement("section", "card summary-card"); appendTextElement(summaryCard, "p", "전체 판단", "section-title"); appendTextElement(summaryCard, "p", analysis.summary); summaryOutput.appendChild(summaryCard); analysis.goals.forEach((goal, index) => analysisOutput.appendChild(createGoalCard(goal, index))); dailyPlanOutput.appendChild(createDailyPlan(analysis.plan)); }
-        function createGoalCard(goal, index) { const card = createElement("article", "card insight-card"); const head = createElement("div", "result-head"); appendTextElement(head, "h2", `${index + 1}. ${goal.title}`, "goal-title"); appendTextElement(head, "span", goal.priority, "rank-badge"); card.appendChild(head); const sections = [["목표 해석", goal.intent], ["오늘 할 일", goal.today], ["공부 / 조사 방법", goal.study], ["추천 검색 키워드", goal.keywords], ["우선순위", goal.priorityText], ["예상 결과물", goal.output], ["더 깊게 발전시키는 방향", goal.expansion]]; const list = createElement("div", "section-list"); sections.forEach(([title, content]) => list.appendChild(createAnalysisSection(title, content))); card.appendChild(list); return card; }
-        function createAnalysisSection(title, content) { const section = createElement("section", "analysis-section"); appendTextElement(section, "h3", title); if (title === "추천 검색 키워드") { const row = createElement("div", "keyword-row"); content.forEach((keyword) => appendTextElement(row, "span", keyword, "keyword")); section.appendChild(row); } else if (Array.isArray(content)) { const list = document.createElement("ul"); content.forEach((item) => appendTextElement(list, "li", item)); section.appendChild(list); } else appendTextElement(section, "p", content); return section; }
+        function buildExpectedOutput(type, options) { const outputs = { course: "강의 후보 비교표, 자격증 필요성 메모, 공부 커리큘럼", study: "연구 질문 목록, 책/논문 후보 목록, 한 장면 분석 노트", content: "유튜브 기획안, 촬영 콘티, 참고 이미지 보드, 장소 후보표", work: "보고서 목차, 자료 요약표, 실행 체크리스트", project: "프로젝트 로드맵, 링크 모음표, Notion 정리 페이지" }; return `${outputs[type]} 중 오늘은 '${options.outputType}'에 맞는 핵심 결과물 1개만 완성합니다.`; }
+        function buildExpansion(type) { const expansions = { course: "이번 주에는 한 강의를 1강만 실제로 들어보고 난이도와 결과물의 품질을 확인하세요. 장기적으로는 작은 자동화 프로젝트를 만들어 포트폴리오로 남기는 방향이 좋습니다.", study: "이번 주에는 영화 한 편을 정해 역사, 철학, 미학 관점으로 각각 한 문단씩 분석해보세요. 장기적으로는 주제별 독서 목록과 장면 아카이브를 만들면 연구 습관이 생깁니다.", content: "이번 주에는 3분짜리 파일럿 영상을 먼저 찍어보세요. 장기적으로는 영화 속 장소, 이야기, 이동 경로를 반복 포맷으로 만들어 시리즈화할 수 있습니다.", work: "이번 주에는 오늘 만든 초안을 공유 가능한 보고서나 발표자료로 다듬으세요. 장기적으로는 반복 업무 템플릿으로 만들면 좋습니다.", project: "이번 주에는 오늘 만든 체크리스트를 다시 보고 반복 가능한 루틴으로 줄이세요. 장기적으로는 결과물 중심의 작은 프로젝트 단위로 관리하는 편이 좋습니다." }; return expansions[type]; }
+        function buildSummary(goals, options) { if (goals.length === 0) return ""; const main = goals.find((goal) => goal.priority === "1순위") || goals[0]; const reality = goals.length >= 4 ? `목표가 ${goals.length}개라서 오늘 모두 깊게 처리하기는 어렵습니다. 1순위만 결과물까지 만들고 나머지는 자료 수집으로 줄이세요.` : `목표가 ${goals.length}개라면 오늘 안에 모두 건드릴 수 있지만 핵심 결과물은 하나만 잡는 편이 현실적입니다.`; return `오늘 목표의 성격은 ${goals.map((goal) => goal.category).join(", ")}입니다. ${reality} 가장 중요한 목표는 "${main.title}"이고, 오늘의 핵심 결과물은 ${options.outputType} 형식의 정리 문서 1개입니다.`; }
+        function buildDailyPlan(goals, options) { const mainGoal = goals[0] || "가장 중요한 목표"; return [{ time: "오전", text: `가벼운 자료 조사, 참고 링크 수집, 이미지 레퍼런스 저장을 합니다. ${mainGoal} 관련 검색어를 먼저 모으고 실제 링크는 검증 전까지 후보로만 둡니다.` }, { time: "오후", text: `가장 중요한 목표 하나를 깊게 분석합니다. ${options.depth} 수준에 맞춰 강의, 논문, 영상 중 핵심 자료 1~2개만 집중해서 정리 노트를 작성합니다.` }, { time: "저녁", text: `결과물을 제작합니다. ${options.outputType}, 링크 모음, 이미지 보드, 기획안 중 하나를 완성하고 내일 이어서 할 일을 작성합니다.` }, { time: "밤", text: "오늘 얻은 자료를 5줄로 요약하고 내일 가장 먼저 할 일 1개만 남깁니다. 새 자료 탐색은 멈추는 것이 좋습니다." }]; }
+        function buildChecklist(goals) { return { must: goals.filter((goal) => goal.priority !== "보류").map((goal) => `${goal.title}: 핵심 자료 1개 확인 후 결과물에 반영`), optional: goals.map((goal) => `${goal.title}: 이미지 레퍼런스 3개와 검색어 5개 저장`), later: goals.filter((goal) => goal.priority === "보류").map((goal) => `${goal.title}: 내일 다시 판단할 보류 항목`) }; }
+        function buildResourceBoard(goals) { return ["유튜브", "블로그", "논문", "이미지", "기타 링크"].map((name) => ({ name, text: goals.map((goal) => `${goal.title}: ${goal.research.korean[0]}`).join(" / "), memo: "사용자가 직접 링크와 메모를 붙여 넣는 영역입니다. 데모에서는 저장하지 않습니다." })); }
+        function analyzeInput() { const rawInput = input.value.trim(); if (!rawInput) { input.focus(); return; } const options = { depth: depthSelect.value, time: timeSelect.value, outputType: outputSelect.value }; analyzeButton.textContent = "분석 중..."; analyzeButton.disabled = true; requestAiAnalysis(rawInput, options).then((analysis) => { renderAnalysis(analysis); state.lastMarkdown = buildMarkdown(analysis); state.lastPlainText = state.lastMarkdown.replace(/[#*`]/g, ""); resultTools.classList.add("visible"); emptyState.style.display = "none"; }).finally(() => { analyzeButton.textContent = "분석하기"; analyzeButton.disabled = false; }); }
+        function renderAnalysis(analysis) { [summaryOutput, analysisOutput, dailyPlanOutput, checklistOutput, boardOutput].forEach(clearElement); const summaryCard = createElement("section", "card summary-card"); appendTextElement(summaryCard, "p", "오늘의 전체 진단", "section-title"); appendTextElement(summaryCard, "p", analysis.summary); summaryOutput.appendChild(summaryCard); analysis.goals.forEach((goal, index) => analysisOutput.appendChild(createGoalCard(goal, index))); dailyPlanOutput.appendChild(createDailyPlan(analysis.plan)); checklistOutput.appendChild(createChecklist(analysis.checklist)); boardOutput.appendChild(createResourceBoard(analysis.board)); }
+        function createGoalCard(goal, index) { const card = createElement("article", "card insight-card"); const head = createElement("div", "result-head"); appendTextElement(head, "h2", `${index + 1}. ${goal.title}`, "goal-title"); appendTextElement(head, "span", goal.priority, "rank-badge"); card.appendChild(head); const meta = createElement("div", "meta-row"); ["분류: " + goal.category, goal.priority, "데모 링크: 검색어 중심"].forEach((item) => appendTextElement(meta, "span", item, "meta-chip")); card.appendChild(meta); const sections = [["목표 해석", goal.intent], ["실행 방향", goal.execution], ["오늘 할 일", goal.today], ["공부 방법", goal.study], ["조사 키워드", goal.research], ["유튜브 추천", goal.resources[0]], ["블로그/웹사이트 추천", goal.resources[1]], ["논문/리포트 검색 방향", goal.resources[4]], ["이미지 자료 추천", goal.imageGuide], ["참고 링크 모음", goal.resources], ["오늘의 핵심 질문", goal.questions], ["우선순위", goal.priorityText], ["예상 결과물", goal.output], ["더 깊게 발전시키는 방향", goal.expansion]]; const list = createElement("div", "section-list"); sections.forEach(([title, content]) => list.appendChild(createAnalysisSection(title, content))); card.appendChild(list); return card; }
+        function createAnalysisSection(title, content) { const section = createElement("section", "analysis-section"); appendTextElement(section, "h3", title); if (title === "조사 키워드") { renderResearchKeywords(section, content); } else if (title === "참고 링크 모음") { section.appendChild(createResourceGrid(content)); } else if (/추천|검색 방향/.test(title) && content.platform) { section.appendChild(createResourceGrid([content])); } else if (title === "오늘의 핵심 질문") { const list = createElement("ol", "question-list"); content.forEach((item) => appendTextElement(list, "li", item)); section.appendChild(list); } else if (Array.isArray(content)) { const list = document.createElement("ul"); content.forEach((item) => appendTextElement(list, "li", item)); section.appendChild(list); } else appendTextElement(section, "p", content); return section; }
+        function renderResearchKeywords(section, research) { Object.entries({ "한국어": research.korean, "영어": research.english, "유튜브": research.youtube, "블로그/글": research.blog, "논문/리포트": research.paper, "이미지": research.image }).forEach(([label, words]) => { appendTextElement(section, "p", label, "field-note"); const row = createElement("div", "keyword-row"); words.forEach((keyword) => appendTextElement(row, "span", keyword, "keyword")); section.appendChild(row); }); }
+        function createResourceGrid(items) { const grid = createElement("div", "resource-grid"); items.forEach((item) => { const card = createElement("article", "resource-card"); appendTextElement(card, "h4", item.title); appendTextElement(card, "p", `플랫폼: ${item.platform}`); appendTextElement(card, "p", `링크: ${item.link}`, "link-placeholder"); appendTextElement(card, "p", `추천 이유: ${item.reason}`); if (item.questions) appendTextElement(card, "p", `정리 질문: ${item.questions.join(" / ")}`); if (item.points) appendTextElement(card, "p", `핵심 포인트: ${item.points.join(" / ")}`); grid.appendChild(card); }); return grid; }
+        function createChecklist(checklist) { const card = createElement("section", "card plan-card"); appendTextElement(card, "h2", "오늘의 체크리스트", "section-title"); const grid = createElement("div", "check-grid"); [["반드시 할 일", checklist.must], ["하면 좋은 일", checklist.optional], ["내일로 넘겨도 되는 일", checklist.later.length ? checklist.later : ["보류 항목이 없다면 새 일을 추가하지 말고 오늘 결과물을 다듬습니다."]]].forEach(([title, items]) => { const block = createElement("article", "check-card"); appendTextElement(block, "h3", title); const list = document.createElement("ul"); items.forEach((item) => appendTextElement(list, "li", item)); block.appendChild(list); grid.appendChild(block); }); card.appendChild(grid); return card; }
+        function createResourceBoard(board) { const card = createElement("section", "card plan-card"); appendTextElement(card, "h2", "자료 수집 보드", "section-title"); const grid = createElement("div", "board-grid"); board.forEach((item) => { const block = createElement("article", "board-card"); appendTextElement(block, "h3", item.name); appendTextElement(block, "p", item.text); appendTextElement(block, "p", item.memo, "link-placeholder"); const memo = document.createElement("textarea"); memo.className = "memo-input"; memo.rows = 3; memo.placeholder = `${item.name} 링크나 메모를 붙여넣기`; block.appendChild(memo); grid.appendChild(block); }); card.appendChild(grid); return card; }
         function createDailyPlan(plan) { const card = createElement("section", "card plan-card"); const heading = createElement("div", "section-heading"); appendTextElement(heading, "h2", "전체 하루 계획", "section-title"); appendTextElement(heading, "span", "무리하지 않는 4단계 루틴", "field-note"); card.appendChild(heading); const grid = createElement("div", "plan-grid"); plan.forEach((item) => { const block = createElement("article", "plan-block"); appendTextElement(block, "h3", item.time); appendTextElement(block, "p", item.text); grid.appendChild(block); }); card.appendChild(grid); return card; }
-        function buildMarkdown(analysis) { const lines = ["# 오늘의 방향 분석", "", "## 전체 판단", analysis.summary, ""]; analysis.goals.forEach((goal, index) => { lines.push(`## ${index + 1}. ${goal.title}`); lines.push(`- 우선순위 분류: ${goal.priority}`); lines.push("### 목표 해석", goal.intent); lines.push("### 오늘 할 일", ...goal.today.map((item) => `- ${item}`)); lines.push("### 공부 / 조사 방법", ...goal.study.map((item) => `- ${item}`)); lines.push("### 추천 검색 키워드", goal.keywords.map((keyword) => `\`${keyword}\``).join(", ")); lines.push("### 우선순위", goal.priorityText); lines.push("### 예상 결과물", goal.output); lines.push("### 더 깊게 발전시키는 방향", goal.expansion, ""); }); lines.push("## 전체 하루 계획"); analysis.plan.forEach((item) => lines.push(`- ${item.time}: ${item.text}`)); return lines.join("\n"); }
+        function buildMarkdown(analysis) { const lines = ["# 오늘의 방향 분석", "", "## 오늘의 전체 진단", analysis.summary, "", `- 난이도: ${analysis.options.depth}`, `- 시간: ${analysis.options.time}`, `- 결과물 유형: ${analysis.options.outputType}`, ""]; analysis.goals.forEach((goal, index) => { lines.push(`## ${index + 1}. ${goal.title}`); lines.push(`- 분류: ${goal.category}`); lines.push(`- 우선순위: ${goal.priority}`); lines.push("### 목표 해석", goal.intent); lines.push("### 실행 방향", ...goal.execution.map((item) => `- ${item}`)); lines.push("### 오늘 할 일", ...goal.today.map((item) => `- ${item}`)); lines.push("### 공부 방법", ...goal.study.map((item) => `- ${item}`)); lines.push("### 조사 키워드", `- 한국어: ${goal.research.korean.join(", ")}`, `- 영어: ${goal.research.english.join(", ")}`, `- 유튜브: ${goal.research.youtube.join(", ")}`, `- 블로그/글: ${goal.research.blog.join(", ")}`, `- 논문/리포트: ${goal.research.paper.join(", ")}`, `- 이미지: ${goal.research.image.join(", ")}`); lines.push("### 참고 자료"); goal.resources.forEach((item) => lines.push(`- ${item.title}: ${item.platform} / ${item.link} / ${item.reason}`)); lines.push("### 이미지 자료 추천", ...goal.imageGuide.map((item) => `- ${item}`)); lines.push("### 오늘의 핵심 질문", ...goal.questions.map((item) => `- ${item}`)); lines.push("### 우선순위", goal.priorityText); lines.push("### 예상 결과물", goal.output); lines.push("### 더 깊게 발전시키는 방향", goal.expansion, ""); }); lines.push("## 전체 하루 계획"); analysis.plan.forEach((item) => lines.push(`- ${item.time}: ${item.text}`)); lines.push("", "## 오늘의 체크리스트", "### 반드시 할 일", ...analysis.checklist.must.map((item) => `- ${item}`), "### 하면 좋은 일", ...analysis.checklist.optional.map((item) => `- ${item}`), "### 내일로 넘겨도 되는 일", ...analysis.checklist.later.map((item) => `- ${item}`)); lines.push("", "## 자료 수집 보드"); analysis.board.forEach((item) => lines.push(`- ${item.name}: ${item.text}`)); return lines.join("\n"); }
         function createElement(tagName, className) { const element = document.createElement(tagName); if (className) element.className = className; return element; }
         function appendTextElement(parent, tagName, text, className) { const element = createElement(tagName, className); element.textContent = text; parent.appendChild(element); return element; }
         function clearElement(element) { while (element.firstChild) element.removeChild(element.firstChild); }
@@ -174,7 +290,7 @@
         function loadNews() { return Promise.resolve([]); }
         analyzeButton.addEventListener("click", analyzeInput);
         exampleButton.addEventListener("click", () => { input.value = exampleGoals; input.focus(); });
-        resetButton.addEventListener("click", () => { input.value = ""; clearElement(summaryOutput); clearElement(analysisOutput); clearElement(dailyPlanOutput); state.lastMarkdown = ""; state.lastPlainText = ""; resultTools.classList.remove("visible"); emptyState.style.display = ""; input.focus(); });
+        resetButton.addEventListener("click", () => { input.value = ""; [summaryOutput, analysisOutput, dailyPlanOutput, checklistOutput, boardOutput].forEach(clearElement); state.lastMarkdown = ""; state.lastPlainText = ""; resultTools.classList.remove("visible"); emptyState.style.display = ""; input.focus(); });
         copyMarkdownButton.addEventListener("click", () => { if (!state.lastMarkdown) return; copyText(state.lastMarkdown).then(() => setCopyFeedback(copyMarkdownButton, "마크다운 복사 완료")); });
         copyButton.addEventListener("click", copyMessage);
         document.querySelector("#recommend-button").addEventListener("click", recommendMessage);
