@@ -1,1076 +1,183 @@
-
 <!DOCTYPE html>
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>오늘의 마음을 전달해드립니다</title>
-    <meta name="description" content="받는 사람을 비워두거나 직접 적어서, 따뜻하게 전할 수 있는 오늘의 마음 문구를 추천받아보세요.">
+    <title>오늘의 방향을 설계하는 AI</title>
+    <meta name="description" content="짧게 적은 오늘의 목표를 실행 방향, 공부 방법, 우선순위, 하루 계획으로 정리하는 AI 스케줄 분석 데모입니다.">
     <meta property="og:type" content="website">
-    <meta property="og:title" content="오늘의 마음을 전달해드립니다">
-    <meta property="og:description" content="받는 사람을 비워두거나 직접 적어서, 따뜻하게 전할 수 있는 오늘의 마음 문구를 추천받아보세요.">
-    <meta property="og:site_name" content="오늘의 마음을 전달해드립니다">
+    <meta property="og:title" content="오늘의 방향을 설계하는 AI">
+    <meta property="og:description" content="막연한 하루 목표를 실행 가능한 계획과 결과물로 바꿔드립니다.">
+    <meta property="og:site_name" content="오늘의 방향을 설계하는 AI">
     <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="오늘의 마음을 전달해드립니다">
-    <meta name="twitter:description" content="받는 사람을 비워두거나 직접 적어서, 따뜻하게 전할 수 있는 오늘의 마음 문구를 추천받아보세요.">
+    <meta name="twitter:title" content="오늘의 방향을 설계하는 AI">
+    <meta name="twitter:description" content="짧게 적은 목표를 실행 가능한 계획으로 바꿔드립니다.">
     <style>
-        :root {
-            --bg: #f8f8f8;
-            --panel: #ffffff;
-            --text: #292a32;
-            --muted: #74747b;
-            --pink: #ff0558;
-            --pink-dark: #d90047;
-            --rose: #fff4f7;
-            --border: #e5e5e8;
-            --soft-border: #f0f0f2;
-            --shadow: rgba(0, 0, 0, 0.08);
-            --accent-yellow: #ffe66d;
-            --accent-mint: #8ee6d2;
-            --accent-lilac: #cdbdff;
-            --body-bg: var(--bg);
-            --app-bg: transparent;
-            --hero-bg: #ffffff;
-            --message-bg: #ffffff;
-        }
-
-        body[data-theme="white"] {
-            --bg: #fbfbfc;
-            --text: #243040;
-            --muted: #667085;
-            --pink: #ff0558;
-            --pink-dark: #d90047;
-            --rose: #ffffff;
-            --border: #e3e6eb;
-            --soft-border: #eef0f3;
-            --shadow: rgba(38, 45, 58, 0.08);
-            --body-bg: #fbfbfc;
-            --hero-bg: #ffffff;
-            --message-bg: #ffffff;
-        }
-
-        * {
-            box-sizing: border-box;
-        }
-
-        body {
-            margin: 0;
-            min-height: 100vh;
-            font-family: Arial, "Noto Sans KR", sans-serif;
-            color: var(--text);
-            background: var(--body-bg);
-        }
-
-        .topbar {
-            position: sticky;
-            top: 0;
-            z-index: 10;
-            border-bottom: 1px solid var(--border);
-            background: rgba(255, 255, 255, 0.96);
-            backdrop-filter: blur(16px);
-        }
-
-        .topbar-inner {
-            display: grid;
-            grid-template-columns: auto 1fr auto;
-            align-items: center;
-            gap: 18px;
-            width: min(1040px, 100%);
-            margin: 0 auto;
-            padding: 13px 20px;
-        }
-
-        .brand {
-            color: var(--pink);
-            font-size: 1.25rem;
-            font-weight: 900;
-            letter-spacing: 0;
-            white-space: nowrap;
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 18px;
-            color: #55565d;
-            font-size: 0.95rem;
-            font-weight: 700;
-        }
-
-        .search-pill {
-            display: flex;
-            align-items: center;
-            min-height: 38px;
-            border: 1px solid var(--soft-border);
-            border-radius: 9px;
-            background: #f5f5f7;
-            color: #8a8b91;
-            font-size: 0.92rem;
-            padding: 0 14px;
-            white-space: nowrap;
-        }
-
-        .page {
-            min-height: calc(100vh - 65px);
-            padding: 0 20px 48px;
-        }
-
-        .app {
-            position: relative;
-            width: min(960px, 100%);
-            margin: 0 auto;
-            background: var(--app-bg);
-        }
-
-        .app::before {
-            content: none;
-        }
-
-        .hero {
-            position: relative;
-            border-bottom: 1px solid var(--border);
-            background: var(--hero-bg);
-            padding: 42px 0 30px;
-        }
-
-        .theme-bar {
-            position: relative;
-            z-index: 1;
-            display: flex;
-            justify-content: flex-end;
-            margin-bottom: 24px;
-        }
-
-        .theme-toggle {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 4px;
-            border: 1px solid var(--border);
-            border-radius: 999px;
-            background: #f6f6f7;
-            padding: 4px;
-        }
-
-        .theme-option {
-            min-height: 36px;
-            border-radius: 999px;
-            color: var(--muted);
-            background: transparent;
-            box-shadow: none;
-            font-size: 0.92rem;
-            padding: 6px 14px;
-        }
-
-        .theme-option.active {
-            color: #fff;
-            background: var(--pink);
-            box-shadow: 0 8px 20px rgba(255, 5, 88, 0.22);
-        }
-
-        .hero::after {
-            content: none;
-        }
-
-        .hero-note {
-            position: relative;
-            z-index: 1;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 14px;
-            border: 1px solid rgba(255, 5, 88, 0.16);
-            border-radius: 999px;
-            background: var(--rose);
-            color: var(--pink-dark);
-            font-size: 0.9rem;
-            font-weight: 700;
-            padding: 8px 12px;
-        }
-
-        .hero-note::before {
-            content: "";
-            width: 10px;
-            height: 10px;
-            border-radius: 999px;
-            background: var(--pink);
-            box-shadow: 12px 0 0 var(--accent-yellow), 24px 0 0 var(--accent-mint);
-        }
-
-        h1 {
-            position: relative;
-            z-index: 1;
-            margin: 0;
-            max-width: 680px;
-            font-size: clamp(2rem, 6vw, 3.35rem);
-            line-height: 1.12;
-            letter-spacing: 0;
-        }
-
-        .subtitle {
-            position: relative;
-            z-index: 1;
-            margin: 14px 0 0;
-            max-width: 620px;
-            color: var(--muted);
-            font-size: 1.05rem;
-            line-height: 1.6;
-        }
-
-        .content {
-            display: grid;
-            gap: 24px;
-            padding: 28px 0 0;
-        }
-
-        .message-box {
-            position: relative;
-            display: grid;
-            min-height: 190px;
-            place-items: center;
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            background: var(--message-bg);
-            box-shadow: 0 12px 32px var(--shadow);
-            padding: 34px 28px 30px;
-        }
-
-        .message-box::before {
-            content: "";
-            position: absolute;
-            left: 18px;
-            top: 18px;
-            width: 48px;
-            height: 6px;
-            border-radius: 999px;
-            background: var(--pink);
-            opacity: 0.95;
-        }
-
-        .recipient-panel {
-            display: grid;
-            gap: 8px;
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            background: #ffffff;
-            padding: 18px;
-        }
-
-        .recipient-panel label {
-            font-size: 0.95rem;
-            font-weight: 700;
-        }
-
-        .recipient-row {
-            display: grid;
-            gap: 10px;
-            grid-template-columns: 1fr auto;
-        }
-
-        #recipient-name {
-            width: 100%;
-            border: 1px solid var(--border);
-            border-radius: 9px;
-            background: #f8f8fa;
-            color: var(--text);
-            font: inherit;
-            min-height: 52px;
-            padding: 12px 18px;
-        }
-
-        #recipient-name:focus-visible {
-            outline: 3px solid rgba(239, 111, 154, 0.28);
-            outline-offset: 2px;
-        }
-
-        #apply-recipient-button {
-            color: #fff;
-            background: var(--pink);
-            box-shadow: 0 10px 24px rgba(255, 5, 88, 0.18);
-            padding: 0 18px;
-            white-space: nowrap;
-        }
-
-        .recipient-help {
-            margin: 0;
-            color: var(--muted);
-            font-size: 0.92rem;
-            line-height: 1.5;
-        }
-
-        #message {
-            margin: 0;
-            text-align: center;
-            font-size: clamp(1.35rem, 4vw, 2rem);
-            font-weight: 700;
-            line-height: 1.45;
-            word-break: keep-all;
-        }
-
-        .name-blank {
-            display: inline-block;
-            width: clamp(4.5rem, 18vw, 7.5rem);
-            height: 0.72em;
-            margin: 0 0.12em;
-            border-bottom: 4px solid var(--pink);
-            border-radius: 999px;
-            background: linear-gradient(90deg, transparent, rgba(255, 5, 88, 0.1), transparent);
-            vertical-align: -0.02em;
-        }
-
-        .actions {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-top: 18px;
-        }
-
-        button {
-            min-height: 52px;
-            border: 0;
-            border-radius: 999px;
-            cursor: pointer;
-            font: inherit;
-            font-weight: 700;
-            transition: transform 160ms ease, box-shadow 160ms ease, background 160ms ease;
-        }
-
-        button:active {
-            transform: translateY(1px);
-        }
-
-        button:focus-visible {
-            outline: 3px solid rgba(239, 111, 154, 0.35);
-            outline-offset: 3px;
-        }
-
-        #recommend-button {
-            color: #fff;
-            background: var(--pink);
-            box-shadow: 0 12px 28px rgba(255, 5, 88, 0.24);
-        }
-
-        #copy-button {
-            color: var(--pink-dark);
-            background: #fff;
-            border: 1px solid var(--border);
-        }
-
-        #copy-button.copied {
-            color: #fff;
-            background: #b44d74;
-            border-color: #b44d74;
-        }
-
-        .date-line {
-            margin: 18px 0 0;
-            color: var(--muted);
-            font-size: 0.95rem;
-            text-align: center;
-        }
-
-        .news-section {
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            background: #ffffff;
-            padding: 22px;
-        }
-
-        .section-head {
-            display: flex;
-            align-items: end;
-            justify-content: space-between;
-            gap: 16px;
-            margin-bottom: 16px;
-        }
-
-        .section-title {
-            margin: 0;
-            font-size: 1.45rem;
-            line-height: 1.25;
-            letter-spacing: 0;
-        }
-
-        .section-note {
-            margin: 6px 0 0;
-            color: var(--muted);
-            line-height: 1.5;
-        }
-
-        .news-updated {
-            color: var(--muted);
-            font-size: 0.9rem;
-            white-space: nowrap;
-        }
-
-        .news-list {
-            display: grid;
-            gap: 10px;
-        }
-
-        .news-card {
-            display: grid;
-            gap: 7px;
-            border: 1px solid var(--soft-border);
-            border-radius: 10px;
-            color: inherit;
-            padding: 14px 16px;
-            text-decoration: none;
-            transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
-        }
-
-        .news-card:hover {
-            border-color: rgba(255, 5, 88, 0.35);
-            box-shadow: 0 10px 24px rgba(0, 0, 0, 0.06);
-            transform: translateY(-1px);
-        }
-
-        .news-title {
-            margin: 0;
-            font-size: 1rem;
-            font-weight: 800;
-            line-height: 1.45;
-        }
-
-        .news-meta {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            color: var(--muted);
-            font-size: 0.9rem;
-        }
-
-        .partnership {
-            margin-top: 28px;
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            background: #ffffff;
-            margin-top: 0;
-            padding: 22px;
-        }
-
-        .partnership h2 {
-            margin: 0;
-            font-size: 1.45rem;
-            line-height: 1.25;
-            letter-spacing: 0;
-        }
-
-        .partnership-copy {
-            margin: 8px 0 20px;
-            color: var(--muted);
-            line-height: 1.6;
-        }
-
-        .partnership-form {
-            display: grid;
-            gap: 14px;
-        }
-
-        .field {
-            display: grid;
-            gap: 7px;
-        }
-
-        .field label {
-            color: var(--text);
-            font-size: 0.95rem;
-            font-weight: 700;
-        }
-
-        .field input,
-        .field select,
-        .field textarea {
-            width: 100%;
-            border: 1px solid var(--border);
-            border-radius: 9px;
-            background: #f8f8fa;
-            color: var(--text);
-            font: inherit;
-            line-height: 1.4;
-            padding: 12px 14px;
-        }
-
-        .field textarea {
-            min-height: 116px;
-            resize: vertical;
-        }
-
-        .field input:focus-visible,
-        .field select:focus-visible,
-        .field textarea:focus-visible {
-            outline: 3px solid rgba(239, 111, 154, 0.28);
-            outline-offset: 2px;
-        }
-
-        #partnership-submit {
-            color: #fff;
-            background: var(--pink);
-            box-shadow: 0 12px 28px rgba(255, 5, 88, 0.2);
-        }
-
-        .form-status {
-            min-height: 24px;
-            margin: 2px 0 0;
-            color: var(--muted);
-            font-size: 0.95rem;
-            line-height: 1.5;
-        }
-
-        .form-status.success {
-            color: #227447;
-        }
-
-        .form-status.error {
-            color: #b42318;
-        }
-
-        @media (max-width: 560px) {
-            .topbar-inner {
-                grid-template-columns: 1fr auto;
-                gap: 12px;
-                padding: 12px 16px;
-            }
-
-            .nav-links {
-                display: none;
-            }
-
-            .search-pill {
-                font-size: 0;
-                min-width: 38px;
-                padding: 0;
-                justify-content: center;
-            }
-
-            .search-pill::before {
-                content: "검색";
-                font-size: 0.88rem;
-            }
-
-            .hero,
-            .content {
-                padding-left: 0;
-                padding-right: 0;
-            }
-
-            .hero-note {
-                max-width: calc(100% - 72px);
-            }
-
-            .theme-bar {
-                justify-content: flex-start;
-            }
-
-            .actions {
-                grid-template-columns: 1fr;
-            }
-
-            .section-head {
-                align-items: start;
-                flex-direction: column;
-            }
-
-            .recipient-row {
-                grid-template-columns: 1fr;
-            }
-
-            #apply-recipient-button {
-                width: 100%;
-            }
-        }
+        :root { --bg: #07111f; --panel: #101f33; --panel-strong: #142640; --text: #f6f9ff; --muted: #aebbd0; --subtle: #7f8da4; --line: rgba(214, 228, 255, 0.14); --line-strong: rgba(214, 228, 255, 0.24); --blue: #8ec5ff; --gray: #dbe4f0; --shadow: rgba(0, 0, 0, 0.28); --radius: 8px; }
+        * { box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body { margin: 0; min-height: 100vh; color: var(--text); background: linear-gradient(180deg, rgba(10, 29, 52, 0.96), var(--bg) 360px), var(--bg); font-family: "Inter", "Noto Sans KR", "Apple SD Gothic Neo", Arial, sans-serif; letter-spacing: 0; }
+        body::before { content: ""; position: fixed; inset: 0; pointer-events: none; background-image: linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px); background-size: 100% 42px; opacity: .32; }
+        button, textarea { font: inherit; }
+        button { min-height: 48px; border: 0; border-radius: 999px; cursor: pointer; font-weight: 800; letter-spacing: 0; transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease, background 160ms ease; }
+        button:active { transform: translateY(1px); }
+        button:focus-visible, textarea:focus-visible { outline: 3px solid rgba(142, 197, 255, .38); outline-offset: 3px; }
+        .page { position: relative; z-index: 1; width: min(1120px, calc(100% - 40px)); margin: 0 auto; padding: 34px 0 52px; }
+        .topbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 12px 0 34px; }
+        .brand { display: inline-flex; align-items: center; gap: 10px; color: var(--gray); font-size: .95rem; font-weight: 900; }
+        .brand-mark { width: 32px; height: 32px; border: 1px solid var(--line-strong); border-radius: 8px; background: linear-gradient(145deg, var(--panel-strong), #091829); box-shadow: 0 10px 28px var(--shadow); }
+        .status-pill { border: 1px solid var(--line); border-radius: 999px; color: var(--muted); background: rgba(255,255,255,.035); font-size: .86rem; padding: 8px 12px; white-space: nowrap; }
+        .hero { display: grid; gap: 18px; padding: 22px 0 26px; }
+        .eyebrow { margin: 0; color: var(--blue); font-size: .9rem; font-weight: 900; }
+        h1 { max-width: 780px; margin: 0; color: var(--text); font-size: clamp(2.3rem, 6vw, 4.7rem); line-height: 1.05; letter-spacing: 0; }
+        .subtitle { max-width: 660px; margin: 0; color: var(--muted); font-size: clamp(1rem, 2vw, 1.18rem); line-height: 1.7; }
+        .workspace { display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); gap: 18px; align-items: start; margin-top: 14px; }
+        .card { border: 1px solid var(--line); border-radius: var(--radius); background: rgba(16, 31, 51, .9); box-shadow: 0 18px 48px var(--shadow); }
+        .input-card { position: sticky; top: 18px; padding: 18px; }
+        .label-row, .result-head, .section-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+        label, .section-title { color: var(--text); font-weight: 900; }
+        .field-note { color: var(--subtle); font-size: .88rem; }
+        #goal-input { width: 100%; min-height: 330px; margin-top: 12px; border: 1px solid var(--line-strong); border-radius: var(--radius); color: var(--text); background: rgba(6, 16, 29, .78); line-height: 1.65; resize: vertical; padding: 16px; }
+        #goal-input::placeholder { color: rgba(174, 187, 208, .78); }
+        .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; }
+        .primary-button { grid-column: 1 / -1; color: #06111f; background: linear-gradient(180deg, #a7d4ff, #78bbff); box-shadow: 0 14px 30px rgba(90,169,255,.28); }
+        .secondary-button { border: 1px solid var(--line-strong); color: var(--text); background: rgba(255,255,255,.055); }
+        .secondary-button:hover, .primary-button:hover { transform: translateY(-1px); }
+        .input-tip { margin: 14px 0 0; color: var(--subtle); font-size: .92rem; line-height: 1.55; }
+        .results { display: grid; gap: 16px; }
+        .empty-state { min-height: 420px; display: grid; align-content: center; gap: 16px; padding: 28px; text-align: left; }
+        .empty-state h2, .plan-card h2 { margin: 0; font-size: clamp(1.35rem, 3vw, 2rem); line-height: 1.2; }
+        .empty-state p { max-width: 520px; margin: 0; color: var(--muted); line-height: 1.7; }
+        .mini-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 8px; }
+        .mini-cell { border: 1px solid var(--line); border-radius: var(--radius); color: var(--gray); background: rgba(255,255,255,.035); font-size: .9rem; line-height: 1.45; padding: 12px; }
+        .result-tools { display: none; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .result-tools.visible { display: grid; }
+        .insight-card, .plan-card, .summary-card { padding: 18px; }
+        .result-head { align-items: start; margin-bottom: 14px; }
+        .goal-title { margin: 0; color: var(--text); font-size: 1.24rem; line-height: 1.45; }
+        .rank-badge { flex: 0 0 auto; border: 1px solid rgba(142,197,255,.28); border-radius: 999px; color: var(--blue); background: rgba(142,197,255,.08); font-size: .82rem; font-weight: 900; padding: 7px 10px; }
+        .section-list { display: grid; gap: 10px; }
+        .analysis-section { display: grid; gap: 8px; border-top: 1px solid var(--line); padding-top: 12px; }
+        .analysis-section:first-child { border-top: 0; padding-top: 0; }
+        .analysis-section h3 { margin: 0; color: var(--blue); font-size: .98rem; }
+        .analysis-section p, .analysis-section li, .plan-block p, .summary-card p { color: var(--gray); line-height: 1.65; }
+        .analysis-section p { margin: 0; }
+        ul { margin: 0; padding-left: 20px; }
+        .keyword-row { display: flex; flex-wrap: wrap; gap: 8px; }
+        .keyword { border: 1px solid var(--line); border-radius: 999px; color: var(--gray); background: rgba(255,255,255,.04); font-size: .88rem; padding: 7px 10px; }
+        .plan-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 14px; }
+        .plan-block { border: 1px solid var(--line); border-radius: var(--radius); background: rgba(255,255,255,.035); padding: 14px; }
+        .plan-block h3 { margin: 0 0 8px; color: var(--blue); font-size: 1rem; }
+        .plan-block p, .summary-card p { margin: 0; }
+        .summary-card { display: grid; gap: 10px; border-color: rgba(142,197,255,.22); background: rgba(20,38,64,.9); }
+        .hidden-compat { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+        @media (max-width: 840px) { .page { width: min(100% - 28px, 720px); padding-top: 18px; } .workspace { grid-template-columns: 1fr; } .input-card { position: static; } #goal-input { min-height: 260px; } }
+        @media (max-width: 560px) { .topbar, .label-row, .result-head, .section-heading { align-items: flex-start; flex-direction: column; } .status-pill { white-space: normal; } .actions, .result-tools, .result-tools.visible, .mini-grid, .plan-grid { grid-template-columns: 1fr; } .empty-state, .insight-card, .plan-card, .summary-card, .input-card { padding: 16px; } }
     </style>
 </head>
 <body>
-    <header class="topbar">
-        <div class="topbar-inner">
-            <div class="brand">마음전달</div>
-            <nav class="nav-links" aria-label="주요 메뉴">
-                <span>추천</span>
-                <span>소식</span>
-                <span>편지</span>
-                <span>제휴</span>
-            </nav>
-            <div class="search-pill" aria-label="문구 검색">콘텐츠, 마음, 문구 검색</div>
-        </div>
-    </header>
-
     <main class="page">
-        <section class="app" aria-label="오늘의 마음 전달 문구 추천기">
-            <header class="hero">
-                <div class="theme-bar" aria-label="화면 모드 선택">
-                    <div class="theme-toggle" role="group" aria-label="테마 선택">
-                        <button class="theme-option active" type="button" data-theme-value="pink">핑크 모드</button>
-                        <button class="theme-option" type="button" data-theme-value="white">화이트 모드</button>
-                    </div>
-                </div>
-                <div class="hero-note">daily tiny letter</div>
-                <h1>오늘의 마음을 전달해드립니다</h1>
-                <p class="subtitle">받는 사람을 비워두거나 직접 적어서, 따뜻하게 전할 수 있는 한 문장을 골라줘요.</p>
-            </header>
-
-            <section class="content">
-                <div class="recipient-panel">
-                    <label for="recipient-name">받는 사람</label>
-                    <div class="recipient-row">
-                        <input id="recipient-name" type="text" autocomplete="off" placeholder="비워두면 빈칸으로 편지를 만들어요">
-                        <button id="apply-recipient-button" type="button">적용</button>
-                    </div>
-                    <p class="recipient-help">이름을 적으면 문장에 바로 들어가고, 비워두면 빈칸 편지로 남아요.</p>
-                </div>
-
-                <div class="message-box" aria-live="polite">
-                    <p id="message"></p>
-                </div>
-
+        <header class="topbar" aria-label="서비스 정보">
+            <div class="brand"><span class="brand-mark" aria-hidden="true"></span><span>AI Schedule Studio</span></div>
+            <div class="status-pill">브라우저에서만 실행되는 데모 분석기</div>
+        </header>
+        <section class="hero" aria-labelledby="page-title">
+            <p class="eyebrow">AI 비서 + 개인 연구실 + 하루 계획표</p>
+            <h1 id="page-title">오늘의 방향을 설계하는 AI</h1>
+            <p class="subtitle">짧게 적은 목표를 실행 가능한 계획으로 바꿔드립니다. 막연한 생각을 목표 해석, 실행 방법, 공부 방향, 우선순위, 결과물로 정리합니다.</p>
+        </section>
+        <section class="workspace" aria-label="목표 분석 작업 영역">
+            <section class="card input-card" aria-label="오늘 목표 입력">
+                <div class="label-row"><label for="goal-input">오늘 하루 목표</label><span class="field-note">번호 목록을 그대로 붙여넣어도 됩니다</span></div>
+                <textarea id="goal-input" placeholder="예: 1. 바이브 코딩 강의 알아보기&#10;2. 영화 기반 인문학 공부 방향 정리&#10;3. 유튜브 촬영 기획 세우기"></textarea>
                 <div class="actions">
-                    <button id="recommend-button" type="button">문구 추천받기</button>
-                    <button id="copy-button" type="button">문구 복사하기</button>
+                    <button class="primary-button" id="analyze-button" type="button">분석하기</button>
+                    <button class="secondary-button" id="example-button" type="button">예시 목표 불러오기</button>
+                    <button class="secondary-button" id="reset-button" type="button">다시 분석하기</button>
                 </div>
-
-                <p class="date-line" id="date-line"></p>
-
-                <section class="news-section" aria-labelledby="news-title">
-                    <div class="section-head">
-                        <div>
-                            <h2 class="section-title" id="news-title">오늘의 소식</h2>
-                            <p class="section-note">외부 RSS에서 가져온 최신 제목과 링크만 보여드려요.</p>
-                        </div>
-                        <span class="news-updated" id="news-updated">업데이트 확인 중</span>
-                    </div>
-                    <div class="news-list" id="news-list" aria-live="polite"></div>
+                <p class="input-tip">현재 버전은 실제 AI API를 호출하지 않고, 입력 문장을 규칙 기반으로 분석하는 데모입니다. 나중에 API 연결 시 requestAiAnalysis 함수만 교체하면 됩니다.</p>
+            </section>
+            <section class="results" aria-live="polite">
+                <div class="result-tools" id="result-tools">
+                    <button class="secondary-button" id="copy-markdown-button" type="button">결과 마크다운 복사</button>
+                    <button class="secondary-button" id="copy-button" type="button">결과 복사</button>
+                </div>
+                <section class="card empty-state" id="empty-state">
+                    <h2>목표를 입력하면 분석 카드가 생성됩니다.</h2>
+                    <p>목표가 많으면 오늘 안에 끝낼 항목과 보류할 항목을 나눕니다. 실행 가능성이 낮은 목표는 더 작은 행동 단위로 쪼개서 제안합니다.</p>
+                    <div class="mini-grid" aria-label="분석 기준"><div class="mini-cell">핵심 의도와 프로젝트 성격 구분</div><div class="mini-cell">오늘, 이번 주, 장기 방향 분리</div><div class="mini-cell">공부법, 조사법, 결과물 제안</div></div>
                 </section>
-
-                <section class="partnership" aria-labelledby="partnership-title">
-                    <h2 id="partnership-title">제휴 문의</h2>
-                    <p class="partnership-copy">함께 해보고 싶은 제안이 있다면 간단히 남겨주세요.</p>
-
-                    <form class="partnership-form" id="partnership-form" action="https://formspree.io/f/xvzdlljk" method="POST">
-                        <div class="field">
-                            <label for="partner-name">이름</label>
-                            <input id="partner-name" name="name" type="text" autocomplete="name" required>
-                        </div>
-
-                        <div class="field">
-                            <label for="partner-email">이메일</label>
-                            <input id="partner-email" name="email" type="email" autocomplete="email" required>
-                        </div>
-
-                        <div class="field">
-                            <label for="partner-type">제휴 유형</label>
-                            <select id="partner-type" name="partnership_type" required>
-                                <option value="">선택해주세요</option>
-                                <option value="brand">브랜드 제휴</option>
-                                <option value="content">콘텐츠 협업</option>
-                                <option value="event">이벤트/프로모션</option>
-                                <option value="other">기타 제안</option>
-                            </select>
-                        </div>
-
-                        <div class="field">
-                            <label for="partner-message">제안 내용</label>
-                            <textarea id="partner-message" name="message" placeholder="제휴 목적, 진행 방식, 연락 가능한 시간 등을 적어주세요." required></textarea>
-                        </div>
-
-                        <input type="hidden" name="_subject" value="오늘의 마음을 전달해드립니다 제휴 문의">
-                        <button id="partnership-submit" type="submit">제휴 문의 보내기</button>
-                        <p class="form-status" id="form-status" role="status" aria-live="polite"></p>
-                    </form>
-                </section>
+                <div id="summary-output"></div><div id="analysis-output"></div><div id="daily-plan-output"></div>
             </section>
         </section>
+        <section class="hidden-compat" aria-hidden="true"><p id="message"></p><input id="recipient-name" type="text" tabindex="-1"><button id="recommend-button" type="button" tabindex="-1">compat</button><div id="news-list"></div><form id="partnership-form"></form></section>
     </main>
-
     <script>
-        const messages = [
-            "{name}, 오늘도 네가 해내는 모든 순간을 믿고 응원해.",
-            "{name}, 완벽하지 않아도 괜찮아. 너는 충분히 잘하고 있어.",
-            "오늘 하루도 {name}답게 천천히, 단단하게 걸어가면 돼.",
-            "{name}, 네가 웃는 순간들이 오늘 더 많이 생기길 바라.",
-            "힘든 일이 있어도 {name}도 분명 잘 넘길 수 있는 사람이야.",
-            "{name}, 오늘의 작은 노력들이 내일의 너를 더 빛나게 할 거야.",
-            "네 편에서 늘 응원하고 있어. {name}, 오늘도 파이팅.",
-            "{name}, 쉬어가도 괜찮아. 중요한 건 네 마음을 지키는 거야.",
-            "오늘도 {name}의 따뜻함과 성실함이 분명 좋은 곳에 닿을 거야.",
-            "{name}, 너는 생각보다 훨씬 강하고 멋진 사람이야.",
-            "조급해하지 않아도 돼. {name}도 {name}의 속도로 잘 가고 있어.",
-            "{name}, 오늘 하루가 너에게 다정한 기억으로 남았으면 좋겠어."
-        ];
+        const exampleGoals = `1. 바이브 코딩 관련 자격증 및 강의 알아보기
+2. 인문학자가 되는 법에 대한 분석적인 연구, 특히 영화를 기반으로 한 공부 방향 찾기
+3. 유튜브 촬영을 위한 명확한 계획 세우기, 영화 속 장면을 찾아가는 여행 유튜브 컨셉 기획하기`;
+        const state = { lastMarkdown: "", lastPlainText: "" };
+        const input = document.querySelector("#goal-input");
+        const analyzeButton = document.querySelector("#analyze-button");
+        const exampleButton = document.querySelector("#example-button");
+        const resetButton = document.querySelector("#reset-button");
+        const copyMarkdownButton = document.querySelector("#copy-markdown-button");
+        const copyButton = document.querySelector("#copy-button");
+        const emptyState = document.querySelector("#empty-state");
+        const resultTools = document.querySelector("#result-tools");
+        const summaryOutput = document.querySelector("#summary-output");
+        const analysisOutput = document.querySelector("#analysis-output");
+        const dailyPlanOutput = document.querySelector("#daily-plan-output");
 
-        const messageElement = document.getElementById("message");
-        const recipientNameInput = document.getElementById("recipient-name");
-        const applyRecipientButton = document.getElementById("apply-recipient-button");
-        const recommendButton = document.getElementById("recommend-button");
-        const copyButton = document.getElementById("copy-button");
-        const dateLine = document.getElementById("date-line");
-        const themeButtons = document.querySelectorAll(".theme-option");
-        const partnershipForm = document.getElementById("partnership-form");
-        const partnershipSubmit = document.getElementById("partnership-submit");
-        const formStatus = document.getElementById("form-status");
-        const newsList = document.getElementById("news-list");
-        const newsUpdated = document.getElementById("news-updated");
-        let currentMessage = "";
-        let currentTemplate = "";
-
-        function getRecipientName() {
-            return recipientNameInput.value.trim();
-        }
-
-        function formatMessage(template) {
-            return template.replaceAll("{name}", getRecipientName() || "_____");
-        }
-
-        function renderMessage(template) {
-            const recipientName = getRecipientName();
-            const parts = template.split("{name}");
-            messageElement.replaceChildren();
-
-            parts.forEach((part, index) => {
-                messageElement.append(document.createTextNode(part));
-
-                if (index < parts.length - 1) {
-                    if (recipientName) {
-                        messageElement.append(document.createTextNode(recipientName));
-                    } else {
-                        const blank = document.createElement("span");
-                        blank.className = "name-blank";
-                        blank.setAttribute("aria-label", "빈칸");
-                        messageElement.append(blank);
-                    }
-                }
+        // 실제 AI API 연결 시 이 함수 내부를 fetch 호출로 교체하면 됩니다.
+        async function requestAiAnalysis(rawInput) { const goals = parseGoals(rawInput); return buildDemoAnalysis(goals); }
+        function parseGoals(rawInput) {
+            const normalized = rawInput.trim(); if (!normalized) return [];
+            const lines = normalized.split(/\n+/).map((line) => line.trim()).filter(Boolean);
+            const goals = []; let current = "";
+            lines.forEach((line) => {
+                const numbered = line.match(/^(\d+)[.)]\s*(.+)$/);
+                if (numbered) { if (current) goals.push(current.trim()); current = numbered[2]; }
+                else if (/^[-*]\s+/.test(line)) { if (current) goals.push(current.trim()); current = line.replace(/^[-*]\s+/, ""); }
+                else if (current) current += " " + line;
+                else current = line;
             });
+            if (current) goals.push(current.trim()); return goals.filter(Boolean);
         }
-
-        function pickMessage() {
-            if (messages.length === 1) {
-                return messages[0];
-            }
-
-            let nextMessage = currentTemplate;
-            while (nextMessage === currentTemplate) {
-                const index = Math.floor(Math.random() * messages.length);
-                nextMessage = messages[index];
-            }
-            return nextMessage;
-        }
-
-        function recommendMessage() {
-            currentTemplate = pickMessage();
-            currentMessage = formatMessage(currentTemplate);
-            renderMessage(currentTemplate);
-            copyButton.textContent = "문구 복사하기";
-            copyButton.classList.remove("copied");
-        }
-
-        function refreshCurrentMessage() {
-            if (!currentTemplate) {
-                recommendMessage();
-                return;
-            }
-
-            currentMessage = formatMessage(currentTemplate);
-            renderMessage(currentTemplate);
-            copyButton.textContent = "문구 복사하기";
-            copyButton.classList.remove("copied");
-        }
-
-        async function copyMessage() {
-            if (!currentMessage) {
-                return;
-            }
-
-            const copied = await copyText(currentMessage);
-            copyButton.textContent = copied ? "복사 완료" : "복사 실패";
-            copyButton.classList.toggle("copied", copied);
-
-            window.setTimeout(() => {
-                copyButton.textContent = "문구 복사하기";
-                copyButton.classList.remove("copied");
-            }, 1600);
-        }
-
-        async function copyText(text) {
-            if (navigator.clipboard && window.isSecureContext) {
-                try {
-                    await navigator.clipboard.writeText(text);
-                    return true;
-                } catch (error) {
-                    console.warn("Clipboard API failed, using fallback.", error);
-                }
-            }
-
-            return fallbackCopyText(text);
-        }
-
-        function fallbackCopyText(text) {
-            const textArea = document.createElement("textarea");
-            textArea.value = text;
-            textArea.setAttribute("readonly", "");
-            textArea.style.position = "fixed";
-            textArea.style.top = "-1000px";
-            textArea.style.left = "-1000px";
-            document.body.appendChild(textArea);
-            textArea.select();
-
-            try {
-                return document.execCommand("copy");
-            } catch (error) {
-                console.warn("Fallback copy failed.", error);
-                return false;
-            } finally {
-                document.body.removeChild(textArea);
-            }
-        }
-
-        function setDateLine() {
-            const today = new Intl.DateTimeFormat("ko-KR", {
-                dateStyle: "full"
-            }).format(new Date());
-            dateLine.textContent = today;
-        }
-
-        function setTheme(theme) {
-            const nextTheme = theme === "white" ? "white" : "pink";
-            document.body.dataset.theme = nextTheme;
-            localStorage.setItem("yeji-theme", nextTheme);
-
-            themeButtons.forEach((button) => {
-                const isActive = button.dataset.themeValue === nextTheme;
-                button.classList.toggle("active", isActive);
-                button.setAttribute("aria-pressed", String(isActive));
-            });
-        }
-
-        async function submitPartnershipForm(event) {
-            event.preventDefault();
-
-            formStatus.textContent = "전송 중입니다...";
-            formStatus.className = "form-status";
-            partnershipSubmit.disabled = true;
-
-            try {
-                const response = await fetch(partnershipForm.action, {
-                    method: "POST",
-                    body: new FormData(partnershipForm),
-                    headers: {
-                        Accept: "application/json"
-                    }
-                });
-
-                if (!response.ok) {
-                    throw new Error("Formspree request failed");
-                }
-
-                partnershipForm.reset();
-                formStatus.textContent = "제휴 문의가 전송되었습니다.";
-                formStatus.className = "form-status success";
-            } catch (error) {
-                console.warn("Partnership form failed.", error);
-                formStatus.textContent = "전송에 실패했습니다. 잠시 후 다시 시도해주세요.";
-                formStatus.className = "form-status error";
-            } finally {
-                partnershipSubmit.disabled = false;
-            }
-        }
-
-        function formatNewsDate(value) {
-            if (!value) {
-                return "";
-            }
-
-            const date = new Date(value);
-            if (Number.isNaN(date.getTime())) {
-                return "";
-            }
-
-            return new Intl.DateTimeFormat("ko-KR", {
-                month: "short",
-                day: "numeric",
-                hour: "2-digit",
-                minute: "2-digit"
-            }).format(date);
-        }
-
-        function renderNews(items) {
-            newsList.replaceChildren();
-
-            if (!items.length) {
-                const empty = document.createElement("p");
-                empty.className = "section-note";
-                empty.textContent = "아직 표시할 소식이 없습니다.";
-                newsList.append(empty);
-                return;
-            }
-
-            items.slice(0, 6).forEach((item) => {
-                const card = document.createElement("a");
-                card.className = "news-card";
-                card.href = item.url;
-                card.target = "_blank";
-                card.rel = "noopener noreferrer";
-
-                const title = document.createElement("p");
-                title.className = "news-title";
-                title.textContent = item.title;
-
-                const meta = document.createElement("div");
-                meta.className = "news-meta";
-
-                const source = document.createElement("span");
-                source.textContent = item.source || "외부 소식";
-                meta.append(source);
-
-                const published = formatNewsDate(item.publishedAt);
-                if (published) {
-                    const date = document.createElement("span");
-                    date.textContent = published;
-                    meta.append(date);
-                }
-
-                card.append(title, meta);
-                newsList.append(card);
-            });
-        }
-
-        const liveNewsSources = [
-            {
-                source: "BBC News 코리아",
-                url: "https://feeds.bbci.co.uk/korean/rss.xml"
-            },
-            {
-                source: "Google 뉴스",
-                url: "https://news.google.com/rss?hl=ko&gl=KR&ceid=KR:ko"
-            },
-            {
-                source: "The Guardian Life",
-                url: "https://www.theguardian.com/lifeandstyle/rss"
-            }
-        ];
-
-        function textFromXml(node, selector) {
-            return node.querySelector(selector)?.textContent?.trim() || "";
-        }
-
-        function linkFromXml(node) {
-            const atomLink = node.querySelector("link[href]");
-            return atomLink?.getAttribute("href") || textFromXml(node, "link");
-        }
-
-        function parseNewsXml(xmlText, source) {
-            const documentXml = new DOMParser().parseFromString(xmlText, "text/xml");
-            const parserError = documentXml.querySelector("parsererror");
-            if (parserError) {
-                throw new Error(`${source} RSS parse failed`);
-            }
-
-            return Array.from(documentXml.querySelectorAll("item, entry"))
-                .map((item) => {
-                    const title = textFromXml(item, "title");
-                    const url = linkFromXml(item);
-                    const publishedAt =
-                        textFromXml(item, "pubDate") ||
-                        textFromXml(item, "published") ||
-                        textFromXml(item, "updated");
-
-                    if (!title || !url) {
-                        return null;
-                    }
-
-                    return {
-                        title,
-                        url,
-                        source,
-                        publishedAt
-                    };
-                })
-                .filter(Boolean);
-        }
-
-        function dedupeNews(items) {
-            const seen = new Set();
-            return items.filter((item) => {
-                const key = item.url || item.title;
-                if (seen.has(key)) {
-                    return false;
-                }
-                seen.add(key);
-                return true;
-            });
-        }
-
-        async function fetchLiveSource(source) {
-            const proxiedUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(source.url)}`;
-            const response = await fetch(proxiedUrl, {
-                cache: "no-store"
-            });
-
-            if (!response.ok) {
-                throw new Error(`${source.source} live RSS request failed`);
-            }
-
-            return parseNewsXml(await response.text(), source.source);
-        }
-
-        async function loadLiveNews() {
-            const results = await Promise.allSettled(liveNewsSources.map(fetchLiveSource));
-            const items = dedupeNews(
-                results
-                    .flatMap((result) => (result.status === "fulfilled" ? result.value : []))
-                    .sort((a, b) => new Date(b.publishedAt) - new Date(a.publishedAt))
-            );
-
-            if (!items.length) {
-                throw new Error("No live RSS items loaded");
-            }
-
-            renderNews(items);
-            newsUpdated.textContent = `${formatNewsDate(new Date().toISOString())} 실시간 확인`;
-        }
-
-        async function loadCachedNews() {
-            try {
-                const response = await fetch(`news.json?ts=${Date.now()}`, {
-                    cache: "no-store"
-                });
-
-                if (!response.ok) {
-                    throw new Error("news.json request failed");
-                }
-
-                const data = await response.json();
-                renderNews(Array.isArray(data.items) ? data.items : []);
-                newsUpdated.textContent = data.updatedAt ? `${formatNewsDate(data.updatedAt)} 갱신` : "자동 갱신";
-            } catch (error) {
-                console.warn("News load failed.", error);
-                renderNews([]);
-                newsUpdated.textContent = "소식 준비 중";
-            }
-        }
-
-        async function loadNews() {
-            newsUpdated.textContent = "실시간 확인 중";
-
-            try {
-                await loadLiveNews();
-            } catch (error) {
-                console.warn("Live news load failed, using cached news.", error);
-                await loadCachedNews();
-            }
-        }
-
-        recommendButton.addEventListener("click", recommendMessage);
-        applyRecipientButton.addEventListener("click", refreshCurrentMessage);
-        recipientNameInput.addEventListener("input", refreshCurrentMessage);
+        function buildDemoAnalysis(goals) { return { goals: goals.map((goal, index) => analyzeGoal(goal, index, goals.length)), plan: buildDailyPlan(goals), summary: buildSummary(goals) }; }
+        function analyzeGoal(goal, index, total) { const type = detectGoalType(goal); const priority = assignPriority(index, total, type); return { title: goal, priority, intent: buildIntent(goal, type), today: buildTodayActions(type, priority), study: buildStudyGuide(type), keywords: buildKeywords(goal, type), priorityText: buildPriorityText(priority, type), output: buildExpectedOutput(type), expansion: buildExpansion(type) }; }
+        function detectGoalType(goal) { const text = goal.toLowerCase(); if (/유튜브|촬영|영상|콘텐츠|기획|여행/.test(text)) return "content"; if (/영화|인문|연구|분석|공부|학자/.test(text)) return "study"; if (/강의|자격증|코딩|ai|바이브|개발/.test(text)) return "course"; return "general"; }
+        function assignPriority(index, total, type) { if (total >= 5 && index >= 3) return "보류"; if (index === 0 || type === "course") return "1순위"; if (index === 1) return "2순위"; return total > 3 ? "보류" : "2순위"; }
+        function buildIntent(goal, type) { const base = { course: "정보 수집 자체보다, 어떤 학습 경로가 시간 대비 가장 현실적인지 판단하려는 목표입니다. 오늘은 결제나 등록보다 비교 기준을 만드는 일이 먼저입니다.", study: "장기 연구 주제를 만들기 위한 탐색 목표입니다. 하루 안에 결론을 내기보다, 영화와 인문학을 연결하는 질문 목록을 만드는 것이 핵심입니다.", content: "아이디어를 실행 가능한 영상 프로젝트로 바꾸려는 목표입니다. 오늘은 촬영보다 컨셉, 장소 후보, 첫 편의 구성안을 좁히는 일이 중요합니다.", general: "막연한 생각을 다음 행동으로 바꾸려는 목표입니다. 오늘 끝낼 일과 이번 주에 이어갈 일을 분리해야 합니다." }; return `${base[type]} 입력한 목표 "${goal}"는 단순 할 일이라기보다 작은 기획 단계에 가깝습니다.`; }
+        function buildTodayActions(type, priority) { const common = priority === "보류" ? ["오늘은 20분만 써서 링크 3개와 질문 3개를 남기고 멈춥니다.", "핵심 목표가 끝난 뒤 여유가 있을 때만 이어갑니다."] : ["25분 단위로 첫 조사를 시작합니다.", "조사한 내용을 바로 한 문장 요약으로 남깁니다.", "마지막 10분에 내일 이어갈 질문을 적습니다."]; const byType = { course: ["강의 후보 5개를 모으고 가격, 난이도, 결과물을 같은 기준으로 비교합니다.", "자격증은 필요성, 인정 범위, 준비 기간을 먼저 확인합니다."], study: ["영화 한 편 또는 감독 한 명으로 범위를 줄입니다.", "인문학 키워드 3개를 정하고 각 키워드가 영화 장면과 어떻게 연결되는지 메모합니다."], content: ["유튜브 첫 영상의 제목 후보 5개를 씁니다.", "장소 후보, 필요한 장면, 촬영 동선을 한 페이지로 정리합니다."], general: ["목표를 조사, 정리, 실행, 결과물 단계로 나눕니다.", "가장 작은 시작 행동 하나를 정합니다."] }; return byType[type].concat(common); }
+        function buildStudyGuide(type) { const guides = { course: ["초보자라면 강의 목차에서 프로젝트 결과물이 있는지 먼저 봅니다. 결과물이 있어야 하루 공부가 포트폴리오로 이어집니다.", "자격증은 채용, 프리랜서, 개인 프로젝트 중 어떤 목적에 쓰일지 정한 뒤 필요 여부를 판단합니다.", "유튜브 후기보다 공식 커리큘럼, 수강생 결과물, 업데이트 날짜를 함께 확인합니다."], study: ["영화 이론, 문화연구, 철학 입문서를 동시에 넓게 훑되 오늘은 한 장면을 분석하는 연습부터 시작합니다.", "논문은 결론부터 읽고, 모르는 개념은 별도 용어장으로 빼서 정리합니다.", "초보자라면 어려운 원전보다 해설서와 강의로 큰 지도를 먼저 잡는 편이 현실적입니다."], content: ["비슷한 여행 유튜브 5개를 보고 제목, 첫 30초, 장소 소개 방식, 엔딩을 표로 비교합니다.", "영화 속 장소는 공식 관광 자료, 촬영지 블로그, 지도 리뷰를 함께 확인해야 실제 이동 가능성을 판단할 수 있습니다.", "기획안은 거창하게 쓰기보다 한 편을 찍을 수 있는 체크리스트로 시작합니다."], general: ["먼저 관련 자료를 넓게 모으고, 그다음 실행 가능성 기준으로 줄입니다.", "초보자라면 전문 용어보다 예시, 입문 강의, 체크리스트형 자료부터 보는 것이 좋습니다."] }; return guides[type]; }
+        function buildKeywords(goal, type) { const words = goal.split(/\s+/).map((word) => word.replace(/[^\w가-힣]/g, "")).filter((word) => word.length >= 2); const uniqueWords = Array.from(new Set(words)).slice(0, 3); const byType = { course: ["AI 코딩 입문 강의", "프롬프트 엔지니어링 자격증", "노코드 자동화 포트폴리오", "강의 커리큘럼 비교"], study: ["영화 인문학 입문", "영화 이론 문화연구", "장면 분석 방법", "인문학 연구 질문 만들기"], content: ["영화 촬영지 여행 유튜브", "여행 유튜브 기획안", "로케이션 리서치 방법", "첫 영상 콘티 작성"], general: ["초보자 실행 계획", "자료 조사 방법", "하루 계획표 만들기", "프로젝트 우선순위"] }; return Array.from(new Set(uniqueWords.concat(byType[type]))).slice(0, 7); }
+        function buildPriorityText(priority, type) { const energy = type === "study" ? "에너지 높음" : type === "content" ? "에너지 중간" : "에너지 낮음"; if (priority === "보류") return `오늘 다 끝내기 어렵습니다. ${energy} 항목이므로 핵심 목표를 끝낸 뒤 자료 링크만 남기는 보류 작업으로 두는 편이 현실적입니다.`; if (priority === "1순위") return `오늘 가장 먼저 처리할 항목입니다. ${energy} 작업이지만, 기준표나 후보 목록처럼 작은 결과물로 끝내면 부담이 줄어듭니다.`; return `중요하지만 첫 번째 목표 뒤에 배치하는 편이 좋습니다. ${energy} 작업이므로 오후 집중 시간에 60분만 깊게 다루는 것을 권합니다.`; }
+        function buildExpectedOutput(type) { const outputs = { course: "강의 후보 비교표 1개, 자격증 필요성 메모 1개, 다음 결정을 위한 체크리스트", study: "영화 기반 인문학 연구 질문 5개, 읽을 자료 링크 목록, 한 장면 분석 노트", content: "유튜브 첫 편 기획안, 촬영지 후보 목록, 제목 후보와 오프닝 멘트 초안", general: "자료 링크 목록, 실행 체크리스트, 내일 이어갈 질문 3개" }; return outputs[type]; }
+        function buildExpansion(type) { const expansions = { course: "이번 주에는 한 강의를 1강만 실제로 들어보고 난이도와 결과물의 품질을 확인하세요. 장기적으로는 작은 자동화 프로젝트를 만들어 포트폴리오로 남기는 방향이 좋습니다.", study: "이번 주에는 영화 한 편을 정해 역사, 철학, 미학 관점으로 각각 한 문단씩 분석해보세요. 장기적으로는 주제별 독서 목록과 장면 아카이브를 만들면 연구 습관이 생깁니다.", content: "이번 주에는 3분짜리 파일럿 영상을 먼저 찍어보세요. 장기적으로는 영화 속 장소, 이야기, 이동 경로를 반복 포맷으로 만들어 시리즈화할 수 있습니다.", general: "이번 주에는 오늘 만든 체크리스트를 다시 보고 반복 가능한 루틴으로 줄이세요. 장기적으로는 결과물 중심의 작은 프로젝트 단위로 관리하는 편이 좋습니다." }; return expansions[type]; }
+        function buildSummary(goals) { if (goals.length === 0) return ""; if (goals.length >= 4) return `목표가 ${goals.length}개라서 오늘 모두 깊게 처리하기는 어렵습니다. 1순위와 2순위만 실제 결과물까지 만들고, 나머지는 링크 수집이나 질문 정리 수준으로 보류하는 편이 현실적입니다.`; return `목표가 ${goals.length}개라면 오늘 안에 모두 건드릴 수는 있지만, 모든 항목을 완성하려고 하면 집중도가 떨어집니다. 오전에는 넓게 조사하고 오후에는 가장 중요한 하나를 깊게 파는 구성이 적합합니다.`; }
+        function buildDailyPlan(goals) { const mainGoal = goals[0] || "가장 중요한 목표"; return [{ time: "오전", text: `가볍게 조사하고 자료를 모읍니다. ${mainGoal}에 필요한 링크와 후보를 먼저 수집하고, 판단 기준을 3개만 정합니다.` }, { time: "오후", text: "핵심 목표 하나를 깊게 파고듭니다. 자료를 계속 모으기보다 비교표, 연구 질문, 기획안 중 하나를 실제 문서로 만듭니다." }, { time: "저녁", text: "정리하고 결과물을 만듭니다. 오늘 모은 링크를 버릴 것과 남길 것으로 나누고, 내일 이어갈 질문을 적습니다." }, { time: "밤", text: "내일 할 일로 이어갑니다. 무리해서 새 작업을 시작하지 말고, 가장 작은 다음 행동 1개만 캘린더나 메모에 남깁니다." }]; }
+        function analyzeInput() { const rawInput = input.value.trim(); if (!rawInput) { input.focus(); return; } analyzeButton.textContent = "분석 중..."; analyzeButton.disabled = true; requestAiAnalysis(rawInput).then((analysis) => { renderAnalysis(analysis); state.lastMarkdown = buildMarkdown(analysis); state.lastPlainText = state.lastMarkdown.replace(/[#*`]/g, ""); resultTools.classList.add("visible"); emptyState.style.display = "none"; }).finally(() => { analyzeButton.textContent = "분석하기"; analyzeButton.disabled = false; }); }
+        function renderAnalysis(analysis) { clearElement(summaryOutput); clearElement(analysisOutput); clearElement(dailyPlanOutput); const summaryCard = createElement("section", "card summary-card"); appendTextElement(summaryCard, "p", "전체 판단", "section-title"); appendTextElement(summaryCard, "p", analysis.summary); summaryOutput.appendChild(summaryCard); analysis.goals.forEach((goal, index) => analysisOutput.appendChild(createGoalCard(goal, index))); dailyPlanOutput.appendChild(createDailyPlan(analysis.plan)); }
+        function createGoalCard(goal, index) { const card = createElement("article", "card insight-card"); const head = createElement("div", "result-head"); appendTextElement(head, "h2", `${index + 1}. ${goal.title}`, "goal-title"); appendTextElement(head, "span", goal.priority, "rank-badge"); card.appendChild(head); const sections = [["목표 해석", goal.intent], ["오늘 할 일", goal.today], ["공부 / 조사 방법", goal.study], ["추천 검색 키워드", goal.keywords], ["우선순위", goal.priorityText], ["예상 결과물", goal.output], ["더 깊게 발전시키는 방향", goal.expansion]]; const list = createElement("div", "section-list"); sections.forEach(([title, content]) => list.appendChild(createAnalysisSection(title, content))); card.appendChild(list); return card; }
+        function createAnalysisSection(title, content) { const section = createElement("section", "analysis-section"); appendTextElement(section, "h3", title); if (title === "추천 검색 키워드") { const row = createElement("div", "keyword-row"); content.forEach((keyword) => appendTextElement(row, "span", keyword, "keyword")); section.appendChild(row); } else if (Array.isArray(content)) { const list = document.createElement("ul"); content.forEach((item) => appendTextElement(list, "li", item)); section.appendChild(list); } else appendTextElement(section, "p", content); return section; }
+        function createDailyPlan(plan) { const card = createElement("section", "card plan-card"); const heading = createElement("div", "section-heading"); appendTextElement(heading, "h2", "전체 하루 계획", "section-title"); appendTextElement(heading, "span", "무리하지 않는 4단계 루틴", "field-note"); card.appendChild(heading); const grid = createElement("div", "plan-grid"); plan.forEach((item) => { const block = createElement("article", "plan-block"); appendTextElement(block, "h3", item.time); appendTextElement(block, "p", item.text); grid.appendChild(block); }); card.appendChild(grid); return card; }
+        function buildMarkdown(analysis) { const lines = ["# 오늘의 방향 분석", "", "## 전체 판단", analysis.summary, ""]; analysis.goals.forEach((goal, index) => { lines.push(`## ${index + 1}. ${goal.title}`); lines.push(`- 우선순위 분류: ${goal.priority}`); lines.push("### 목표 해석", goal.intent); lines.push("### 오늘 할 일", ...goal.today.map((item) => `- ${item}`)); lines.push("### 공부 / 조사 방법", ...goal.study.map((item) => `- ${item}`)); lines.push("### 추천 검색 키워드", goal.keywords.map((keyword) => `\`${keyword}\``).join(", ")); lines.push("### 우선순위", goal.priorityText); lines.push("### 예상 결과물", goal.output); lines.push("### 더 깊게 발전시키는 방향", goal.expansion, ""); }); lines.push("## 전체 하루 계획"); analysis.plan.forEach((item) => lines.push(`- ${item.time}: ${item.text}`)); return lines.join("\n"); }
+        function createElement(tagName, className) { const element = document.createElement(tagName); if (className) element.className = className; return element; }
+        function appendTextElement(parent, tagName, text, className) { const element = createElement(tagName, className); element.textContent = text; parent.appendChild(element); return element; }
+        function clearElement(element) { while (element.firstChild) element.removeChild(element.firstChild); }
+        function copyText(text) { if (navigator.clipboard && window.isSecureContext) return navigator.clipboard.writeText(text).catch(() => fallbackCopyText(text)); return fallbackCopyText(text); }
+        function fallbackCopyText(text) { const textarea = document.createElement("textarea"); textarea.value = text; textarea.setAttribute("readonly", ""); textarea.style.position = "fixed"; textarea.style.left = "-9999px"; document.body.appendChild(textarea); textarea.select(); let success = false; try { success = document.execCommand("copy"); } catch (error) { success = false; } document.body.removeChild(textarea); return success ? Promise.resolve() : Promise.reject(new Error("copy failed")); }
+        function setCopyFeedback(button, text) { const original = button.textContent; button.textContent = text; window.setTimeout(() => { button.textContent = original; }, 1500); }
+        function copyMessage() { if (!state.lastPlainText) return; copyText(state.lastPlainText).then(() => setCopyFeedback(copyButton, "복사 완료")); }
+        function recommendMessage() { analyzeInput(); }
+        function loadNews() { return Promise.resolve([]); }
+        analyzeButton.addEventListener("click", analyzeInput);
+        exampleButton.addEventListener("click", () => { input.value = exampleGoals; input.focus(); });
+        resetButton.addEventListener("click", () => { input.value = ""; clearElement(summaryOutput); clearElement(analysisOutput); clearElement(dailyPlanOutput); state.lastMarkdown = ""; state.lastPlainText = ""; resultTools.classList.remove("visible"); emptyState.style.display = ""; input.focus(); });
+        copyMarkdownButton.addEventListener("click", () => { if (!state.lastMarkdown) return; copyText(state.lastMarkdown).then(() => setCopyFeedback(copyMarkdownButton, "마크다운 복사 완료")); });
         copyButton.addEventListener("click", copyMessage);
-        themeButtons.forEach((button) => {
-            button.addEventListener("click", () => {
-                setTheme(button.dataset.themeValue);
-            });
-        });
-        partnershipForm.addEventListener("submit", submitPartnershipForm);
-
-        setTheme(localStorage.getItem("yeji-theme"));
-        setDateLine();
-        recommendMessage();
-        loadNews();
+        document.querySelector("#recommend-button").addEventListener("click", recommendMessage);
     </script>
 </body>
 </html>
